@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UPModels</title>
+<style>
+:root{
+  --ink:#12141a; --muted:#6b7280; --line:rgba(255,255,255,.75);
+  --glass:rgba(255,255,255,.52); --glass-strong:rgba(255,255,255,.8);
+  --accent:#3b6cff; --accent2:#8b5cf6;
+  --shadow:0 12px 44px rgba(60,80,140,.15), 0 1px 0 rgba(255,255,255,.95) inset, 0 -1px 0 rgba(255,255,255,.3) inset;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,Roboto,sans-serif;color:var(--ink);background:#f4f6fb;overflow:hidden;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(135deg,#fdfdff,#eef2fb 55%,#f8f1fb)}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.7;animation:float 20s ease-in-out infinite}
+.b1{width:560px;height:560px;background:#b9d0ff;top:-160px;left:-120px}
+.b2{width:520px;height:520px;background:#e4c8ff;bottom:-160px;right:-100px;animation-delay:-7s}
+.b3{width:400px;height:400px;background:#c4f2e5;top:38%;left:46%;animation-delay:-12s}
+.b4{width:300px;height:300px;background:#ffd9c7;top:8%;right:12%;animation-delay:-4s;opacity:.55}
+@keyframes float{50%{transform:translate(50px,-36px) scale(1.1)}}
+
+.glass{background:var(--glass);backdrop-filter:blur(30px) saturate(190%);-webkit-backdrop-filter:blur(30px) saturate(190%);border:1px solid var(--line);box-shadow:var(--shadow)}
+.app{display:flex;height:100vh;height:100dvh;padding:14px;gap:14px}
+.sidebar{width:256px;border-radius:28px;padding:18px 14px;display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px;font-weight:700;font-size:19px;letter-spacing:-.4px}
+.logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;box-shadow:0 6px 16px rgba(59,108,255,.4), inset 0 1px 0 rgba(255,255,255,.55)}
+.nav{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;cursor:pointer;font-size:14.5px;font-weight:500;color:#2c303a;border:1px solid transparent;transition:.2s;background:none;text-align:left;width:100%}
+.nav:hover{background:rgba(255,255,255,.65)}
+.nav.active{background:var(--glass-strong);border-color:var(--line);box-shadow:0 4px 16px rgba(60,80,140,.1)}
+.nav svg{width:18px;height:18px;flex-shrink:0}
+.nav.hist-item{font-size:13.5px;font-weight:400;color:#555;padding:9px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.side-title{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:16px 12px 6px}
+.hist{display:flex;flex-direction:column;gap:2px;overflow:auto;flex:1}
+.userbox{margin-top:auto;border-radius:18px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:.2s;background:rgba(255,255,255,.55)}
+.userbox:hover{background:rgba(255,255,255,.85)}
+.userbox .ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex-shrink:0}
+.userbox b{display:block;font-size:14px}
+.userbox span{font-size:12px;color:var(--muted)}
+.userbox svg{margin-left:auto;width:18px;height:18px;opacity:.55}
+
+.main{flex:1;border-radius:28px;position:relative;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.view{display:none;flex:1;flex-direction:column;min-height:0}
+.view.active{display:flex}
+
+.messages{flex:1;overflow:auto;padding:30px 24px 10px;display:flex;flex-direction:column;gap:18px;scroll-behavior:smooth}
+.empty{margin:auto;text-align:center;max-width:540px}
+.empty h1{font-size:40px;letter-spacing:-1.2px;margin-bottom:12px;background:linear-gradient(135deg,#12141a 20%,var(--accent) 70%,var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.empty p{color:var(--muted);font-size:15.5px;line-height:1.55}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:22px}
+.chip{padding:10px 15px;border-radius:999px;font-size:13px;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.6);transition:.2s;box-shadow:0 2px 8px rgba(60,80,140,.06)}
+.chip:hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 20px rgba(60,80,140,.14)}
+.msg{display:flex;gap:12px;max-width:780px;width:100%;margin:0 auto;animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}}
+.msg .body{padding:13px 17px;border-radius:20px;font-size:15px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.msg.user{justify-content:flex-end}
+.msg.user .body{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 8px 22px rgba(59,108,255,.3);border-bottom-right-radius:8px}
+.msg.ai .body{background:var(--glass-strong);border:1px solid var(--line);border-top-left-radius:8px;box-shadow:0 4px 16px rgba(60,80,140,.07)}
+.msg.ai .body.err{color:#b4233a;background:rgba(255,235,238,.85)}
+.msg .who{font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.msg .body pre{background:rgba(20,24,40,.92);color:#e8ecf8;padding:12px 14px;border-radius:12px;overflow:auto;font-size:13px;margin:8px 0;white-space:pre}
+.msg .body code{background:rgba(60,80,140,.1);padding:1px 6px;border-radius:6px;font-size:.92em}
+.msg .body pre code{background:none;padding:0}
+.typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa3b5;margin-right:4px;animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{50%{opacity:.25}}
+
+.composer-wrap{padding:10px 24px 22px;position:relative}
+.composer{max-width:780px;margin:0 auto;border-radius:26px;padding:10px 10px 10px 18px;display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.82);transition:.25s}
+.composer:focus-within{box-shadow:0 14px 50px rgba(80,100,240,.22), 0 1px 0 #fff inset;border-color:rgba(139,92,246,.35)}
+.composer textarea{border:none;outline:none;background:transparent;resize:none;font-size:15px;min-height:26px;max-height:160px;padding-top:6px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.row .left{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.model-btn,.repo-chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.8);cursor:pointer;font-size:13.5px;font-weight:600;transition:.2s}
+.model-btn:hover,.repo-chip:hover{background:#fff;box-shadow:0 4px 14px rgba(60,80,140,.12)}
+.model-btn svg.chev{width:14px;height:14px;opacity:.6}
+.repo-chip{padding:7px 12px;font-size:12.5px;display:none}
+.repo-chip.on{display:flex}
+.send{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:grid;place-items:center;box-shadow:0 8px 18px rgba(59,108,255,.42);transition:.2s;flex-shrink:0}
+.send:hover{transform:scale(1.08)}
+.send svg{width:18px;height:18px}
+
+.picker{position:absolute;left:50%;bottom:calc(100% - 14px);transform:translate(-50%,10px) scale(.98);width:min(740px,calc(100% - 40px));max-height:min(500px,62vh);border-radius:26px;overflow:hidden;display:flex;opacity:0;pointer-events:none;transition:.22s;background:rgba(255,255,255,.86);z-index:20}
+.picker.open{opacity:1;pointer-events:auto;transform:translate(-50%,0) scale(1)}
+.p-left{width:220px;padding:12px;border-right:1px solid rgba(0,0,0,.06);overflow:auto;display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+.p-right{flex:1;padding:12px;overflow:auto;display:flex;flex-direction:column;gap:3px}
+.divider{height:1px;background:rgba(0,0,0,.07);margin:6px 8px}
+.prov{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:500;transition:.15s}
+.prov:hover{background:rgba(255,255,255,.95)}
+.prov.sel{background:#fff;box-shadow:0 3px 12px rgba(60,80,140,.13)}
+.prov small{margin-left:auto;color:var(--muted);font-size:12px}
+.mrow{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;cursor:pointer;transition:.15s}
+.mrow:hover{background:rgba(255,255,255,.95)}
+.mrow.sel{background:#fff;box-shadow:0 3px 12px rgba(60,80,140,.13)}
+.mrow .t{font-size:14.5px;font-weight:600}
+.mrow .d{font-size:12.5px;color:var(--muted);margin-top:1px}
+.mrow.locked{opacity:.55}
+.tag{margin-left:auto;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(59,108,255,.1);color:var(--accent);white-space:nowrap}
+.tag.max{background:rgba(139,92,246,.12);color:var(--accent2)}
+.tag.ultra{background:rgba(20,22,28,.92);color:#fff}
+.tag.api{background:rgba(31,179,138,.14);color:#0d7f63}
+.p-note{font-size:12.5px;color:var(--muted);padding:6px 10px 10px;line-height:1.5}
+.pool{display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 8px}
+.pool span{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;padding:4px 10px 4px 5px;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid var(--line)}
+.p-sub{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:10px 10px 4px}
+
+.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.5)}
+.av svg{width:58%;height:58%}
+.av.lg{width:36px;height:36px}.av.sm{width:24px;height:24px}.av.xs{width:18px;height:18px}
+
+.plans-scroll{overflow:auto;padding:46px 30px;flex:1}
+.plans-head{text-align:center;margin-bottom:36px}
+.plans-head h1{font-size:40px;letter-spacing:-1.2px;margin-bottom:10px}
+.plans-head p{color:var(--muted);font-size:15.5px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;max-width:980px;margin:0 auto}
+.plan{border-radius:28px;padding:28px 24px;display:flex;flex-direction:column;gap:14px;position:relative;background:rgba(255,255,255,.6);transition:.25s}
+.plan:hover{transform:translateY(-5px)}
+.plan.pop{background:rgba(255,255,255,.92);border:1.5px solid rgba(139,92,246,.45);box-shadow:0 20px 56px rgba(110,90,230,.24), 0 1px 0 #fff inset}
+.badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:#fff;padding:4px 12px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));letter-spacing:.05em;white-space:nowrap}
+.plan h3{font-size:20px}
+.price{font-size:44px;font-weight:700;letter-spacing:-1.6px}
+.price span{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:9px;font-size:14px;flex:1}
+.plan li{display:flex;gap:9px;align-items:flex-start;line-height:1.4}
+.plan li:before{content:"";width:16px;height:16px;margin-top:2px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+
+.btn{padding:12px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.85);font-weight:600;font-size:14px;cursor:pointer;transition:.2s}
+.btn:hover{background:#fff;box-shadow:0 6px 18px rgba(60,80,140,.15)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;box-shadow:0 8px 22px rgba(80,90,240,.4)}
+.btn.danger{color:#b4233a}
+.btn.sm{padding:8px 12px;font-size:13px;border-radius:11px}
+.btn.current{opacity:.6;cursor:default}
+
+/* modal */
+.overlay{position:fixed;inset:0;z-index:40;background:rgba(220,226,245,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;place-items:center;padding:20px}
+.overlay.open{display:grid;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.modal{width:min(880px,100%);height:min(620px,100%);border-radius:30px;display:flex;overflow:hidden;background:rgba(255,255,255,.78);animation:rise .3s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes rise{from{transform:translateY(18px) scale(.97);opacity:0}}
+.m-nav{width:210px;padding:18px 12px;border-right:1px solid rgba(0,0,0,.06);display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.m-nav h2{font-size:18px;padding:4px 10px 12px;letter-spacing:-.3px}
+.m-body{flex:1;overflow:auto;padding:26px 28px;position:relative}
+.m-body h3{font-size:22px;letter-spacing:-.5px;margin-bottom:4px}
+.m-body .sub{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.5}
+.m-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.06);cursor:pointer;display:grid;place-items:center;font-size:18px;z-index:2}
+.m-close:hover{background:rgba(0,0,0,.12)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12.5px;font-weight:600;color:#444}
+.field input,.field select{padding:11px 13px;border-radius:13px;border:1px solid rgba(0,0,0,.1);background:rgba(255,255,255,.85);outline:none;font-size:14px;transition:.2s}
+.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(59,108,255,.14)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{border-radius:20px;padding:14px 16px;background:rgba(255,255,255,.75);border:1px solid var(--line);display:flex;align-items:center;gap:12px;margin-bottom:10px;box-shadow:0 3px 12px rgba(60,80,140,.06)}
+.card .grow{flex:1;min-width:0}
+.card .t{font-weight:600;font-size:14.5px}
+.card .d{font-size:12.5px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card.soon{opacity:.55}
+.sw{position:relative;width:42px;height:25px;border-radius:999px;background:rgba(0,0,0,.15);cursor:pointer;transition:.2s;flex-shrink:0;border:none}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.25);transition:.2s}
+.sw.on{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.sw.on:after{left:20px}
+.swatches{display:flex;gap:10px}
+.swatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;box-shadow:0 3px 10px rgba(0,0,0,.18);transition:.2s}
+.swatch.sel{border-color:#fff;outline:2px solid var(--ink)}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5;padding:10px 12px;border-radius:12px;background:rgba(59,108,255,.07);margin-bottom:16px}
+.repo-list{max-height:230px;overflow:auto;margin-top:8px}
+.actions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+
+.toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,30px);padding:12px 20px;border-radius:16px;font-size:14px;opacity:0;transition:.3s;z-index:60;pointer-events:none;background:rgba(255,255,255,.9)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.menu-btn{display:none}
+@media(max-width:760px){
+  .sidebar{position:fixed;z-index:30;left:14px;top:14px;bottom:14px;transform:translateX(-120%);transition:.3s;background:rgba(255,255,255,.92)}
+  .sidebar.open{transform:none}
+  .menu-btn{display:grid;position:absolute;top:14px;left:14px;z-index:5;width:40px;height:40px;border-radius:12px;place-items:center;cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.85)}
+  .messages,.plans-scroll{padding-top:66px}
+  .picker{flex-direction:column}
+  .p-left{width:100%;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(0,0,0,.06)}
+  .prov{white-space:nowrap}.prov small{display:none}.divider{width:1px;height:auto;margin:4px}
+  .empty h1{font-size:30px}
+  .modal{flex-direction:column}
+  .m-nav{width:100%;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(0,0,0,.06);padding:12px}
+  .m-nav h2{display:none}
+  .m-nav .nav{white-space:nowrap;width:auto}
+  .two{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+
+<div class="app">
+  <aside class="sidebar glass" id="sidebar">
+    <div class="brand"><div class="logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 11l6-6 6 6"/></svg></div>UPModels</div>
+    <button class="nav active" data-view="chat" id="newChat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New chat</button>
+    <button class="nav" data-view="plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>Check plans</button>
+    <button class="nav" id="openSettings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+    <div class="side-title">Recent</div>
+    <div class="hist" id="hist"></div>
+    <div class="userbox glass" id="userbox"><div class="ava" id="uAva">U</div><div><b id="uName">Guest</b><span id="planName">Free plan</span></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></div>
+  </aside>
+
+  <main class="main glass">
+    <div class="menu-btn" id="menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></div>
+
+    <section class="view active" id="view-chat">
+      <div class="messages" id="messages"></div>
+      <div class="composer-wrap">
+        <div class="picker glass" id="picker"><div class="p-left" id="pLeft"></div><div class="p-right" id="pRight"></div></div>
+        <div class="composer glass">
+          <textarea id="input" rows="1" placeholder="Ask anything…"></textarea>
+          <div class="row">
+            <div class="left">
+              <button class="model-btn" id="modelBtn"></button>
+              <button class="repo-chip" id="repoChip" title="Remove attached repo"></button>
+            </div>
+            <button class="send" id="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 11l6-6 6 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-plans">
+      <div class="plans-scroll">
+        <div class="plans-head"><h1>Choose your plan</h1><p>Every frontier model in one place. Upgrade or cancel anytime.</p></div>
+        <div class="plans" id="plans"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal glass">
+    <div class="m-nav" id="mNav"></div>
+    <div class="m-body" id="mBody"></div>
+    <button class="m-close" id="mClose">✕</button>
+  </div>
+</div>
+<div class="toast glass" id="toast"></div>
+
+<script>
+/* ================= CONFIG ================= */
+const PLANS = [
+  {id:'startup', name:'Startup', price:10, rank:1, feats:['Access to fast & balanced models','Generous daily messages','Auto model routing','Chat history']},
+  {id:'max',     name:'Max',     price:25, rank:2, pop:true, feats:['Everything in Startup','Flagship models from every provider','5× more messages','Priority speed']},
+  {id:'ultra',   name:'Ultra',   price:40, rank:3, feats:['Everything in Max','Newest & most powerful models','Highest limits','Early access to new releases']},
+];
+const PROVIDERS = [
+  {id:'anthropic', name:'Anthropic', color:['#e8875a','#c4552d'], icon:'star', models:[
+    {n:'Claude Fable 5.1', d:'Most capable, deep reasoning', plan:3},
+    {n:'Claude Opus 5.5', d:'Flagship for hard tasks', plan:2},
+    {n:'Claude Sonnet 5.5', d:'Smart and efficient', plan:1},
+    {n:'Claude Haiku 5.5', d:'Fastest, lightweight', plan:1}]},
+  {id:'spacex', name:'SpaceX', color:['#2b2f3a','#0a0b0f'], icon:'rocket', models:[
+    {n:'Grok 5', d:'Frontier model with real-time knowledge', plan:3},
+    {n:'Grok 4.1', d:'Strong all-rounder', plan:2},
+    {n:'Grok 4 Fast', d:'Quick answers, low latency', plan:1}]},
+  {id:'gemini', name:'Gemini', color:['#5b8cff','#a45cff'], icon:'spark', models:[
+    {n:'Gemini 3 Ultra', d:'Largest multimodal model', plan:3},
+    {n:'Gemini 3 Pro', d:'Advanced reasoning & long context', plan:2},
+    {n:'Gemini 3 Flash', d:'Fast and affordable', plan:1}]},
+  {id:'chatgpt', name:'ChatGPT', color:['#1fb38a','#0d7f63'], icon:'knot', models:[
+    {n:'GPT-5.5 Pro', d:'Maximum reasoning power', plan:3},
+    {n:'GPT-5.5', d:'Flagship general model', plan:2},
+    {n:'GPT-5 mini', d:'Light and quick', plan:1}]},
+];
+const AUTO = {id:'auto', name:'Auto', color:['#3b6cff','#8b5cf6'], icon:'auto'};
+const API_TYPES = {
+  openai:   {label:'OpenAI-compatible (OpenAI, xAI, OpenRouter, Groq, local…)', base:'https://api.openai.com/v1', color:['#1fb38a','#0d7f63']},
+  anthropic:{label:'Anthropic', base:'https://api.anthropic.com/v1', color:['#e8875a','#c4552d']},
+  gemini:   {label:'Google Gemini', base:'https://generativelanguage.googleapis.com/v1beta', color:['#5b8cff','#a45cff']},
+};
+const THEMES = [['#3b6cff','#8b5cf6'],['#ff6a3d','#ff3d8b'],['#10b981','#06b6d4'],['#f59e0b','#ef4444'],['#111827','#4b5563']];
+
+const ICONS = {
+  star:'<path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+  rocket:'<path d="M12 2c3 2.5 4.5 6 4.5 10l-2 3.5h-5L7.5 12C7.5 8 9 4.5 12 2z" fill="#fff"/><path d="M8.5 16l-2.5 4 4-1.5M15.5 16l2.5 4-4-1.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
+  spark:'<path d="M12 2C12.8 8 16 11.2 22 12c-6 .8-9.2 4-10 10-.8-6-4-9.2-10-10 6-.8 9.2-4 10-10z" fill="#fff"/>',
+  knot:'<circle cx="12" cy="12" r="6.5" stroke="#fff" stroke-width="2.4" fill="none"/><circle cx="12" cy="12" r="2" fill="#fff"/>',
+  auto:'<path d="M13 2L5 14h6l-1 8 8-12h-6z" fill="#fff"/>',
+  key:'<circle cx="8" cy="12" r="3.6" stroke="#fff" stroke-width="2.2" fill="none"/><path d="M11.6 12H21M17 12v3.5M20 12v2.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>',
+  api:'<path d="M8 7l-5 5 5 5M16 7l5 5-5 5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  git:'<circle cx="6" cy="6" r="2.4" fill="#fff"/><circle cx="6" cy="18" r="2.4" fill="#fff"/><circle cx="18" cy="9" r="2.4" fill="#fff"/><path d="M6 8.4v7.2M18 11.4c0 3-6 2-12 4.2" stroke="#fff" stroke-width="2" fill="none"/>',
+};
+function avatarRaw(c,icon,cls=''){return `<div class="av ${cls}" style="background:linear-gradient(135deg,${c[0]},${c[1]})"><svg viewBox="0 0 24 24">${ICONS[icon]}</svg></div>`}
+const avatar=(p,cls)=>avatarRaw(p.color,p.icon,cls);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ================= STATE (localStorage) ================= */
+const LS = {
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const S = {
+  plan:LS.get('up_plan',0), name:LS.get('up_name',''), theme:LS.get('up_theme',0),
+  api:LS.get('up_apimodels',[]), gh:LS.get('up_gh',null), repo:LS.get('up_repo',null),
+  chats:LS.get('up_chats',[]), sel:LS.get('up_sel',{provider:'auto',model:'Auto'}), pickProv:'anthropic', cur:null
+};
+const $=id=>document.getElementById(id);
+const planLabel=()=>S.plan?PLANS[S.plan-1].name:'Free';
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2400)}
+function applyTheme(){const t=THEMES[S.theme]||THEMES[0];document.documentElement.style.setProperty('--accent',t[0]);document.documentElement.style.setProperty('--accent2',t[1])}
+function renderUser(){$('uName').textContent=S.name||'Guest';$('uAva').textContent=(S.name||'U')[0].toUpperCase();$('planName').textContent=planLabel()+' plan'}
+if(S.sel.provider==='api'&&!S.api.find(m=>m.id===S.sel.model))S.sel={provider:'auto',model:'Auto'};
+
+/* ================= VIEWS ================= */
+function show(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+v));
+  document.querySelectorAll('.nav[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));
+  $('sidebar').classList.remove('open');closePicker();
+}
+document.querySelectorAll('.nav[data-view]').forEach(b=>b.onclick=()=>{if(b.id==='newChat')newChat();show(b.dataset.view)});
+$('menu').onclick=()=>$('sidebar').classList.toggle('open');
+
+/* ================= MODEL PICKER ================= */
+const apiProv=m=>({color:API_TYPES[m.type].color,icon:'key',name:m.name});
+function curProvider(){
+  if(S.sel.provider==='auto')return AUTO;
+  if(S.sel.provider==='api'){const m=S.api.find(x=>x.id===S.sel.model);return m?apiProv(m):AUTO}
+  return PROVIDERS.find(p=>p.id===S.sel.provider)||AUTO;
+}
+function curLabel(){if(S.sel.provider==='api'){const m=S.api.find(x=>x.id===S.sel.model);return m?m.name:'Auto'}return S.sel.model}
+function renderBtn(){
+  $('modelBtn').innerHTML=avatar(curProvider(),'sm')+`<span>${esc(curLabel())}</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg>`;
+}
+const tagFor=p=>`<span class="tag ${p===2?'max':p===3?'ultra':''}">${PLANS[p-1].name}</span>`;
+const autoApi=()=>S.api.filter(m=>m.auto);
+const builtinAvail=()=>PROVIDERS.flatMap(p=>p.models.map(m=>({p,m}))).filter(x=>x.m.plan<=Math.max(S.plan,1));
+
+function renderPicker(){
+  const isAuto=S.sel.provider==='auto';
+  let l=`<div class="prov ${S.pickProv==='auto'?'sel':''}" data-p="auto">${avatar(AUTO,'sm')}Auto</div><div class="divider"></div>`;
+  PROVIDERS.forEach(p=>l+=`<div class="prov ${S.pickProv===p.id?'sel':''}" data-p="${p.id}">${avatar(p,'sm')}${p.name}<small>${p.models.length}</small></div>`);
+  l+=`<div class="divider"></div><div class="prov ${S.pickProv==='api'?'sel':''}" data-p="api">${avatarRaw(['#14b8a6','#0ea5e9'],'api','sm')}ApiModels<small>${S.api.length}</small></div>`;
+  $('pLeft').innerHTML=l;
+
+  let r='';
+  if(S.pickProv==='auto'){
+    const api=autoApi();
+    r=`<div class="mrow ${isAuto?'sel':''}" data-auto="1">${avatar(AUTO,'lg')}<div><div class="t">Auto</div><div class="d">Picks the best model for each message</div></div></div>`;
+    if(api.length){
+      r+=`<div class="p-sub">Routing pool · your ApiModels</div><div class="pool">${api.map(m=>`<span>${avatarRaw(API_TYPES[m.type].color,'key','xs')}${esc(m.name)}</span>`).join('')}</div><div class="p-note">Auto answers with these models using your own API keys.</div>`;
+    }else{
+      r+=`<div class="p-sub">Routing pool · plan models</div><div class="pool">${builtinAvail().slice(0,10).map(x=>`<span>${avatar(x.p,'xs')}${esc(x.m.n)}</span>`).join('')}</div><div class="p-note">Add your own key in <b>ApiModels</b> and it will appear here — Auto will use it for real answers.</div>`;
+    }
+  }else if(S.pickProv==='api'){
+    r=S.api.map(m=>`<div class="mrow ${S.sel.provider==='api'&&S.sel.model===m.id?'sel':''}" data-api="${m.id}">${avatarRaw(API_TYPES[m.type].color,'key','lg')}<div><div class="t">${esc(m.name)}</div><div class="d">${esc(m.modelId)} · ${API_TYPES[m.type].label.split(' (')[0]}</div></div><span class="tag api">${m.auto?'In Auto':'API'}</span></div>`).join('');
+    r+=`<div class="mrow" data-add="1"><div class="av lg" style="background:rgba(0,0,0,.07);color:#333;font-size:22px;box-shadow:none">+</div><div><div class="t">Add API model</div><div class="d">Connect your own key — stored only in this browser</div></div></div>`;
+  }else{
+    const p=PROVIDERS.find(x=>x.id===S.pickProv);
+    r=p.models.map(m=>{const locked=S.plan<m.plan;return `<div class="mrow ${S.sel.provider===p.id&&S.sel.model===m.n?'sel':''} ${locked?'locked':''}" data-m="${m.n}" data-plan="${m.plan}">${avatar(p,'lg')}<div><div class="t">${m.n}</div><div class="d">${m.d}</div></div>${tagFor(m.plan)}</div>`}).join('');
+  }
+  $('pRight').innerHTML=r;
+
+  $('pLeft').querySelectorAll('.prov').forEach(e=>e.onclick=()=>{S.pickProv=e.dataset.p;renderPicker()});
+  $('pRight').querySelectorAll('.mrow').forEach(e=>e.onclick=()=>{
+    if(e.dataset.auto){S.sel={provider:'auto',model:'Auto'}}
+    else if(e.dataset.add){closePicker();openSettings('api');return}
+    else if(e.dataset.api){S.sel={provider:'api',model:e.dataset.api}}
+    else{
+      const need=+e.dataset.plan;
+      if(S.plan<need){toast(`${PLANS[need-1].name} plan required`);closePicker();show('plans');return}
+      S.sel={provider:S.pickProv,model:e.dataset.m};
+    }
+    LS.set('up_sel',S.sel);renderBtn();closePicker();
+  });
+}
+function closePicker(){$('picker').classList.remove('open')}
+$('modelBtn').onclick=e=>{e.stopPropagation();S.pickProv=S.sel.provider==='api'?'api':(S.sel.provider==='auto'?'auto':S.sel.provider);renderPicker();$('picker').classList.toggle('open')};
+/* FIX: clicks inside the picker re-render its content, so they must never reach the outside-click handler */
+$('picker').addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('click',closePicker);
+
+/* ================= CHAT ================= */
+const SUGGEST=['Explain quantum computing simply','Write a landing page headline','Plan a 3-day trip to Istanbul','Debug my JavaScript code'];
+function emptyState(){
+  $('messages').innerHTML=`<div class="empty"><h1>${S.name?'Hi, '+esc(S.name)+'.':'What can I help with?'}</h1><p>One subscription, every frontier model. Pick a model below, connect your own API key, or leave it on Auto.</p><div class="chips">${SUGGEST.map(s=>`<div class="chip">${s}</div>`).join('')}</div></div>`;
+  document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('input').value=c.textContent;send()});
+}
+function newChat(){S.cur=null;emptyState();renderHist()}
+function renderHist(){
+  $('hist').innerHTML=S.chats.slice().reverse().slice(0,14).map(c=>`<button class="nav hist-item" data-id="${c.id}">${esc(c.title)}</button>`).join('');
+  $('hist').querySelectorAll('.nav').forEach(b=>b.onclick=()=>{S.cur=S.chats.find(c=>c.id==b.dataset.id);renderMsgs();show('chat')});
+}
+const saveChats=()=>LS.set('up_chats',S.chats.slice(-30));
+function md(t){
+  let s=esc(t);
+  s=s.replace(/```(?:\w+)?\n?([\s\S]*?)```/g,(m,c)=>`<pre><code>${c.replace(/\n$/,'')}</code></pre>`);
+  s=s.replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>');
+  return s;
+}
+function addMsg(role,text,av,name,err){
+  const box=$('messages');if(box.querySelector('.empty'))box.innerHTML='';
+  const d=document.createElement('div');d.className='msg '+role;
+  d.innerHTML=role==='user'?`<div class="body"></div>`:`${avatarRaw(av?av[0]:AUTO.color,av?av[1]:'auto','lg')}<div style="min-width:0"><div class="who">${esc(name||'Auto')}</div><div class="body ${err?'err':''}"></div></div>`;
+  const b=d.querySelector('.body');if(role==='user')b.textContent=text;else b.innerHTML=md(text);
+  box.appendChild(d);box.scrollTop=box.scrollHeight;return d;
+}
+function renderMsgs(){
+  $('messages').innerHTML='';if(!S.cur||!S.cur.msgs.length)return emptyState();
+  S.cur.msgs.forEach(m=>addMsg(m.role,m.text,m.av,m.name,m.err));
+}
+function pickAuto(text){
+  const api=autoApi();
+  if(api.length){const m=api[Math.floor(Math.random()*api.length)];return {kind:'api',m,name:m.name,av:[API_TYPES[m.type].color,'key']}}
+  const avail=builtinAvail();const hard=text.length>120||/code|bug|prove|analy|plan/i.test(text);
+  const top=Math.max(...avail.map(a=>a.m.plan));
+  let pool=avail.filter(x=>hard?x.m.plan===top:x.m.plan===1);if(!pool.length)pool=avail;
+  const x=pool[Math.floor(Math.random()*pool.length)];
+  return {kind:'demo',name:x.m.n,av:[x.p.color,x.p.icon]};
+}
+
+/* ---- real API calls (browser → provider, using the user's own key) ---- */
+async function repoContext(){
+  if(!S.repo||!S.gh)return '';
+  try{
+    const r=await fetch(`https://api.github.com/repos/${S.repo}/readme`,{headers:{Authorization:'Bearer '+S.gh.token,Accept:'application/vnd.github.raw+json'}});
+    if(!r.ok)return '';
+    const t=(await r.text()).slice(0,8000);
+    return `The user attached the GitHub repository "${S.repo}". Its README:\n\n${t}`;
+  }catch(e){return ''}
+}
+async function callApi(m,history,system){
+  const base=(m.base||API_TYPES[m.type].base).replace(/\/+$/,'');
+  let res,data;
+  if(m.type==='anthropic'){
+    res=await fetch(base+'/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':m.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:m.modelId,max_tokens:4096,system:system||undefined,messages:history})});
+    data=await res.json();if(!res.ok)throw new Error(data.error?.message||res.statusText);
+    return (data.content||[]).map(c=>c.text||'').join('');
+  }
+  if(m.type==='gemini'){
+    res=await fetch(`${base}/models/${encodeURIComponent(m.modelId)}:generateContent?key=${encodeURIComponent(m.key)}`,{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({contents:history.map(h=>({role:h.role==='assistant'?'model':'user',parts:[{text:h.content}]})),systemInstruction:system?{parts:[{text:system}]}:undefined})});
+    data=await res.json();if(!res.ok)throw new Error(data.error?.message||res.statusText);
+    return (data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('')||'(empty response)';
+  }
+  const msgs=(system?[{role:'system',content:system}]:[]).concat(history);
+  res=await fetch(base+'/chat/completions',{method:'POST',headers:{'content-type':'application/json',Authorization:'Bearer '+m.key},body:JSON.stringify({model:m.modelId,messages:msgs})});
+  data=await res.json();if(!res.ok)throw new Error(data.error?.message||res.statusText);
+  return data.choices?.[0]?.message?.content||'(empty response)';
+}
+
+async function send(){
+  const text=$('input').value.trim();if(!text)return;
+  $('input').value='';$('input').style.height='auto';
+  if(!S.cur){S.cur={id:Date.now(),title:text.slice(0,34),msgs:[]};S.chats.push(S.cur)}
+  const history=S.cur.msgs.filter(m=>!m.err).map(m=>({role:m.role==='user'?'user':'assistant',content:m.text}));
+  history.push({role:'user',content:text});
+  S.cur.msgs.push({role:'user',text});addMsg('user',text);
+
+  let target; // {kind, m?, name, av}
+  if(S.sel.provider==='auto')target=pickAuto(text);
+  else if(S.sel.provider==='api'){const m=S.api.find(x=>x.id===S.sel.model);target={kind:'api',m,name:m.name,av:[API_TYPES[m.type].color,'key']}}
+  else{const p=curProvider();target={kind:'demo',name:S.sel.model,av:[p.color,p.icon]}}
+  const label=S.sel.provider==='auto'?'Auto → '+target.name:target.name;
+  const el=addMsg('ai','',target.av,label);
+  el.querySelector('.body').innerHTML='<span class="typing"><span></span><span></span><span></span></span>';
+  let reply,err=false;
+  try{
+    if(target.kind==='api')reply=await callApi(target.m,history,await repoContext());
+    else{await new Promise(r=>setTimeout(r,800));reply=`Demo reply from ${target.name}.\n\nBuilt-in models need your backend. To get real answers right now, open **Settings → API Models** and add your own key — it will appear under **ApiModels** and in **Auto**.`}
+  }catch(e){err=true;reply='Request failed: '+e.message+'\n\nCheck the key, model ID and base URL in Settings → API Models.'}
+  const b=el.querySelector('.body');b.innerHTML=md(reply);if(err)b.classList.add('err');
+  S.cur.msgs.push({role:'ai',text:reply,av:target.av,name:label,err});saveChats();renderHist();
+  $('messages').scrollTop=$('messages').scrollHeight;
+}
+$('send').onclick=send;
+$('input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+$('input').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,160)+'px'});
+
+function renderRepoChip(){
+  const c=$('repoChip');
+  if(S.repo){c.classList.add('on');c.innerHTML=avatarRaw(['#334155','#0f172a'],'git','xs')+`<span>${esc(S.repo)}</span><span style="opacity:.5">✕</span>`}
+  else c.classList.remove('on');
+}
+$('repoChip').onclick=()=>{S.repo=null;LS.set('up_repo',null);renderRepoChip();toast('Repository detached')};
+
+/* ================= PLANS ================= */
+function renderPlans(){
+  $('plans').innerHTML=PLANS.map(p=>{const cur=S.plan===p.rank;
+    return `<div class="plan glass ${p.pop?'pop':''}">${p.pop?'<div class="badge">MOST POPULAR</div>':''}<h3>${p.name}</h3><div class="price">$${p.price}<span>/month</span></div><ul>${p.feats.map(f=>`<li>${f}</li>`).join('')}</ul><button class="btn ${p.pop&&!cur?'primary':''} ${cur?'current':''}" data-r="${p.rank}">${cur?'Current plan':'Choose '+p.name}</button></div>`}).join('');
+  $('plans').querySelectorAll('.btn').forEach(b=>b.onclick=()=>{
+    const r=+b.dataset.r;if(r===S.plan)return;
+    /* TODO: redirect to payment (Stripe etc.) */
+    S.plan=r;LS.set('up_plan',r);renderUser();renderPlans();toast(`${PLANS[r-1].name} plan activated (demo)`);
+  });
+}
+
+/* ================= SETTINGS ================= */
+const TABS=[['general','General'],['api','API Models'],['integrations','Integrations'],['data','Data & privacy']];
+let curTab='general', editId=null;
+function openSettings(tab){curTab=tab||curTab;editId=null;$('overlay').classList.add('open');renderSettings()}
+function closeSettings(){$('overlay').classList.remove('open');renderPicker();renderBtn();emptyIfBlank()}
+function emptyIfBlank(){if(!S.cur)emptyState()}
+$('openSettings').onclick=()=>{$('sidebar').classList.remove('open');openSettings('general')};
+$('userbox').onclick=()=>{$('sidebar').classList.remove('open');openSettings('general')};
+$('mClose').onclick=closeSettings;
+$('overlay').addEventListener('mousedown',e=>{if(e.target===$('overlay'))closeSettings()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSettings()});
+
+function renderSettings(){
+  $('mNav').innerHTML='<h2>Settings</h2>'+TABS.map(t=>`<button class="nav ${t[0]===curTab?'active':''}" data-t="${t[0]}">${t[1]}</button>`).join('');
+  $('mNav').querySelectorAll('.nav').forEach(b=>b.onclick=()=>{curTab=b.dataset.t;editId=null;renderSettings()});
+  const body=$('mBody');body.scrollTop=0;
+  ({general:tabGeneral,api:tabApi,integrations:tabInteg,data:tabData})[curTab](body);
+}
+
+function tabGeneral(b){
+  b.innerHTML=`<h3>General</h3><div class="sub">Personalize UPModels.</div>
+  <div class="field"><label>Display name</label><input id="fName" value="${esc(S.name)}" placeholder="Your name"></div>
+  <div class="field"><label>Accent color</label><div class="swatches">${THEMES.map((t,i)=>`<div class="swatch ${i===S.theme?'sel':''}" data-i="${i}" style="background:linear-gradient(135deg,${t[0]},${t[1]})"></div>`).join('')}</div></div>
+  <div class="field"><label>Current plan</label><div class="card"><div class="grow"><div class="t">${planLabel()}</div><div class="d">Manage subscription on the plans page</div></div><button class="btn sm" id="goPlans">Check plans</button></div></div>`;
+  $('fName').oninput=e=>{S.name=e.target.value;LS.set('up_name',S.name);renderUser()};
+  b.querySelectorAll('.swatch').forEach(s=>s.onclick=()=>{S.theme=+s.dataset.i;LS.set('up_theme',S.theme);applyTheme();tabGeneral(b)});
+  $('goPlans').onclick=()=>{closeSettings();show('plans')};
+}
+
+function tabApi(b){
+  if(editId!==null)return apiForm(b);
+  b.innerHTML=`<h3>API Models</h3><div class="sub">Connect your own API key. The model appears under <b>ApiModels</b> in the model picker and can be included in <b>Auto</b>.</div>
+  <div class="note">🔒 Keys are stored only in this browser (localStorage) and are sent directly to the provider you choose — never to UPModels servers. Anyone with access to this browser profile can read them, so don't use it on shared computers.</div>
+  ${S.api.length?S.api.map(m=>`<div class="card">${avatarRaw(API_TYPES[m.type].color,'key','lg')}<div class="grow"><div class="t">${esc(m.name)}</div><div class="d">${esc(m.modelId)} · ${esc(API_TYPES[m.type].label.split(' (')[0])} · key •••• ${esc(m.key.slice(-4))}</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><button class="sw ${m.auto?'on':''}" data-auto="${m.id}" title="Include in Auto"></button><span style="font-size:10.5px;color:var(--muted)">Auto</span></div>
+    <button class="btn sm" data-edit="${m.id}">Edit</button><button class="btn sm danger" data-del="${m.id}">Remove</button></div>`).join(''):'<div class="sub" style="margin-top:-6px">No API models yet.</div>'}
+  <button class="btn primary" id="addApi" style="margin-top:6px">+ Add API model</button>`;
+  $('addApi').onclick=()=>{editId='new';renderSettings()};
+  b.querySelectorAll('[data-edit]').forEach(x=>x.onclick=()=>{editId=x.dataset.edit;renderSettings()});
+  b.querySelectorAll('[data-del]').forEach(x=>x.onclick=()=>{
+    S.api=S.api.filter(m=>m.id!==x.dataset.del);LS.set('up_apimodels',S.api);
+    if(S.sel.provider==='api'&&S.sel.model===x.dataset.del){S.sel={provider:'auto',model:'Auto'};LS.set('up_sel',S.sel)}
+    toast('Model removed');renderSettings();
+  });
+  b.querySelectorAll('[data-auto]').forEach(x=>x.onclick=()=>{const m=S.api.find(y=>y.id===x.dataset.auto);m.auto=!m.auto;LS.set('up_apimodels',S.api);renderSettings()});
+}
+function apiForm(b){
+  const m=editId==='new'?{type:'openai',name:'',modelId:'',key:'',base:'',auto:true}:S.api.find(x=>x.id===editId);
+  b.innerHTML=`<h3>${editId==='new'?'Add API model':'Edit API model'}</h3><div class="sub">Works directly from your browser with your own key.</div>
+  <div class="field"><label>Provider type</label><select id="aType">${Object.entries(API_TYPES).map(([k,v])=>`<option value="${k}" ${m.type===k?'selected':''}>${v.label}</option>`).join('')}</select></div>
+  <div class="two"><div class="field"><label>Display name</label><input id="aName" value="${esc(m.name)}" placeholder="My GPT"></div>
+  <div class="field"><label>Model ID</label><input id="aModel" value="${esc(m.modelId)}" placeholder="gpt-5.5 / claude-sonnet-5-5 / gemini-3-pro"></div></div>
+  <div class="field"><label>API key</label><input id="aKey" type="password" value="${esc(m.key)}" placeholder="sk-…" autocomplete="off"></div>
+  <div class="field"><label>Base URL (optional)</label><input id="aBase" value="${esc(m.base||'')}" placeholder="${API_TYPES[m.type].base}"></div>
+  <div class="card" style="margin-bottom:16px"><div class="grow"><div class="t">Include in Auto</div><div class="d">Auto will route messages to this model</div></div><button class="sw ${m.auto?'on':''}" id="aAuto"></button></div>
+  <div class="actions"><button class="btn primary" id="aSave">Save</button><button class="btn" id="aTest">Test connection</button><button class="btn" id="aCancel">Cancel</button></div>`;
+  let auto=m.auto;
+  $('aAuto').onclick=()=>{auto=!auto;$('aAuto').classList.toggle('on',auto)};
+  $('aType').onchange=()=>{$('aBase').placeholder=API_TYPES[$('aType').value].base};
+  const read=()=>({id:m.id||('m'+Date.now()),type:$('aType').value,name:$('aName').value.trim(),modelId:$('aModel').value.trim(),key:$('aKey').value.trim(),base:$('aBase').value.trim(),auto});
+  $('aSave').onclick=()=>{
+    const v=read();if(!v.name||!v.modelId||!v.key){toast('Fill name, model ID and API key');return}
+    if(editId==='new')S.api.push(v);else S.api=S.api.map(x=>x.id===v.id?v:x);
+    LS.set('up_apimodels',S.api);editId=null;toast('API model saved — see ApiModels in the picker');renderSettings();
+  };
+  $('aTest').onclick=async()=>{
+    const v=read();if(!v.modelId||!v.key){toast('Enter model ID and API key first');return}
+    $('aTest').textContent='Testing…';
+    try{await callApi(v,[{role:'user',content:'Reply with the single word: ok'}]);toast('✓ Connection works')}
+    catch(e){toast('✗ '+e.message)}
+    $('aTest').textContent='Test connection';
+  };
+  $('aCancel').onclick=()=>{editId=null;renderSettings()};
+}
+
+let ghRepos=null;
+function tabInteg(b){
+  const connected=!!S.gh;
+  b.innerHTML=`<h3>Integrations</h3><div class="sub">Connect your tools. Tokens are stored only in this browser.</div>
+  <div class="card">${avatarRaw(['#334155','#0f172a'],'git','lg')}<div class="grow"><div class="t">GitHub</div><div class="d">${connected?'Connected as '+esc(S.gh.user.login):'Attach repositories to your chats'}</div></div>${connected?'<button class="btn sm danger" id="ghOff">Disconnect</button>':''}</div>
+  ${connected?`<div class="p-sub" style="padding-left:2px">Your repositories</div><div class="repo-list" id="repoList"><div class="sub">Loading…</div></div>
+  <div class="note" style="margin-top:12px">An attached repository's README is sent as context to your <b>ApiModels</b> with each message.</div>`
+  :`<div class="note">Create a <b>Personal access token</b> on GitHub (Settings → Developer settings → Tokens) with <code>repo</code> read access, then paste it here.</div>
+  <div class="field"><label>Personal access token</label><input id="ghTok" type="password" placeholder="ghp_… or github_pat_…" autocomplete="off"></div>
+  <button class="btn primary" id="ghOn">Connect GitHub</button>`}
+  <div style="margin-top:22px"></div>
+  ${['Google Drive','Notion','Slack'].map(n=>`<div class="card soon"><div class="av lg" style="background:rgba(0,0,0,.12);color:#333;box-shadow:none;font-weight:700">${n[0]}</div><div class="grow"><div class="t">${n}</div><div class="d">Coming soon</div></div><span class="tag">Soon</span></div>`).join('')}`;
+  if(connected){
+    $('ghOff').onclick=()=>{S.gh=null;S.repo=null;ghRepos=null;LS.set('up_gh',null);LS.set('up_repo',null);renderRepoChip();toast('GitHub disconnected');renderSettings()};
+    loadRepos();
+  }else{
+    $('ghOn').onclick=async()=>{
+      const token=$('ghTok').value.trim();if(!token){toast('Paste your token first');return}
+      $('ghOn').textContent='Connecting…';
+      try{
+        const r=await fetch('https://api.github.com/user',{headers:{Authorization:'Bearer '+token}});
+        if(!r.ok)throw new Error(r.status===401?'Invalid token':'GitHub error '+r.status);
+        const u=await r.json();S.gh={token,user:{login:u.login,avatar:u.avatar_url}};LS.set('up_gh',S.gh);toast('Connected as '+u.login);renderSettings();
+      }catch(e){toast('✗ '+e.message);$('ghOn').textContent='Connect GitHub'}
+    };
+  }
+}
+async function loadRepos(){
+  const box=$('repoList');if(!box)return;
+  try{
+    if(!ghRepos){const r=await fetch('https://api.github.com/user/repos?sort=updated&per_page=40',{headers:{Authorization:'Bearer '+S.gh.token}});if(!r.ok)throw new Error('GitHub error '+r.status);ghRepos=await r.json()}
+    if(!$('repoList'))return;
+    box.innerHTML=ghRepos.length?ghRepos.map(r=>`<div class="card" style="padding:10px 14px"><div class="grow"><div class="t">${esc(r.full_name)}</div><div class="d">${esc(r.description||'No description')}</div></div><button class="btn sm ${S.repo===r.full_name?'current':''}" data-repo="${esc(r.full_name)}">${S.repo===r.full_name?'Attached':'Attach'}</button></div>`).join(''):'<div class="sub">No repositories found.</div>';
+    box.querySelectorAll('[data-repo]').forEach(x=>x.onclick=()=>{S.repo=x.dataset.repo;LS.set('up_repo',S.repo);renderRepoChip();toast('Attached '+S.repo);loadRepos()});
+  }catch(e){if($('repoList'))$('repoList').innerHTML=`<div class="sub">Could not load repositories: ${esc(e.message)}</div>`}
+}
+
+function tabData(b){
+  b.innerHTML=`<h3>Data & privacy</h3><div class="sub">Everything is stored locally in your browser.</div>
+  <div class="card"><div class="grow"><div class="t">Chat history</div><div class="d">${S.chats.length} saved chats</div></div><button class="btn sm danger" id="clrChats">Clear chats</button></div>
+  <div class="card"><div class="grow"><div class="t">API keys</div><div class="d">${S.api.length} ApiModels saved</div></div><button class="btn sm danger" id="clrKeys">Remove all keys</button></div>
+  <div class="card"><div class="grow"><div class="t">Export data</div><div class="d">Download chats & settings (keys not included)</div></div><button class="btn sm" id="exp">Export</button></div>
+  <div class="card"><div class="grow"><div class="t">Reset everything</div><div class="d">Clears all UPModels data in this browser</div></div><button class="btn sm danger" id="rst">Reset</button></div>`;
+  $('clrChats').onclick=()=>{S.chats=[];S.cur=null;LS.set('up_chats',[]);renderHist();toast('Chats cleared');tabData(b)};
+  $('clrKeys').onclick=()=>{S.api=[];LS.set('up_apimodels',[]);if(S.sel.provider==='api'){S.sel={provider:'auto',model:'Auto'};LS.set('up_sel',S.sel)}toast('Keys removed');tabData(b)};
+  $('exp').onclick=()=>{const blob=new Blob([JSON.stringify({chats:S.chats,name:S.name,plan:S.plan,apiModels:S.api.map(m=>({...m,key:undefined}))},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='upmodels-export.json';a.click()};
+  $('rst').onclick=()=>{if(confirm('Delete all UPModels data in this browser?')){Object.keys(localStorage).filter(k=>k.startsWith('up_')).forEach(k=>localStorage.removeItem(k));location.reload()}};
+}
+
+/* ================= INIT ================= */
+applyTheme();renderUser();renderBtn();renderPicker();renderPlans();renderHist();renderRepoChip();emptyState();
+</script>
+</body>
+</html>
