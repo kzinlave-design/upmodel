@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Solution.AI</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2337352f'/%3E%3Ctext x='16' y='22' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='Arial'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2337352f'/%3E%3Ccircle cx='11' cy='14' r='2' fill='white'/%3E%3Ccircle cx='21' cy='14' r='2' fill='white'/%3E%3Cpath d='M10 20c1.5 2.5 3.5 3.5 6 3.5s4.5-1 6-3.5' stroke='white' stroke-width='2.2' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#fff; --side:#f7f7f5; --ink:#37352f; --muted:#787774; --faint:#9b9a97;
@@ -216,12 +216,82 @@ button{background:none;border:none;cursor:pointer;text-align:left}
 .msg.ai .col{overflow:hidden}
 @media(max-width:760px){.fc-s{display:none}.fc-b button{padding:4px 8px}.sidebar:not(.open){box-shadow:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* icons + settings */
+.av{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 1px 2px rgba(15,15,15,.18)}
+.av.lg{border-radius:9px}
+.av.logo-img{background:#fff;border:1px solid var(--line);overflow:hidden;box-shadow:none}
+.av.logo-img img{width:100%;height:100%;object-fit:cover;display:block}
+.sect{font-size:12px;color:var(--faint);font-weight:500;margin:20px 2px 2px}
+
+/* thinking animation: a bar is cut into pieces, spins, and closes into a ring */
+.think{--s:22px;--dur:9s;position:relative;display:inline-block;width:var(--s);height:var(--s);flex-shrink:0;vertical-align:middle}
+.think i{position:absolute;left:50%;top:50%;width:calc(var(--s)*.15);height:calc(var(--s)*.26);margin:calc(var(--s)*-.13) 0 0 calc(var(--s)*-.075);border-radius:99px;background:currentColor;
+  transform:rotate(calc(var(--i)*30deg)) translateY(calc(var(--s)*-.36))}
+.logo .think{color:#fff;--s:18px}
+.logo{width:28px;height:28px;border-radius:8px}
+.typing.thinking{display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+.typing.thinking .tt{color:var(--faint);font-size:13.5px}
+.typing.thinking>.tt{margin:0;animation:none;background:none;width:auto;height:auto;border-radius:0}
+.typing.thinking>.think{margin:0;background:none;border-radius:0;width:var(--s);height:var(--s);display:inline-block}
+.think i{animation:thinkseg var(--dur) cubic-bezier(.65,0,.35,1) infinite}
+.think{animation:thinkspin var(--dur) cubic-bezier(.65,0,.35,1) infinite}
+body.busy .think{--dur:3.2s}
+@keyframes thinkseg{
+  0%,8%{transform:translate(calc((var(--i) - 5.5)*var(--s)*.085),0) rotate(90deg) translateY(0) scaleY(1.5)}
+  22%{transform:translate(calc((var(--i) - 5.5)*var(--s)*.085),0) rotate(90deg) translateY(0) scaleY(1.5)}
+  36%{transform:translate(calc((var(--i) - 5.5)*var(--s)*.17),calc((var(--i) - 5.5)*var(--s)*.05)) rotate(calc(90deg + (var(--i) - 5.5)*8deg)) translateY(0) scaleY(1.2)}
+  62%{transform:rotate(calc(var(--i)*30deg)) translateY(calc(var(--s)*-.36)) scaleY(1)}
+  100%{transform:rotate(calc(var(--i)*30deg)) translateY(calc(var(--s)*-.36)) scaleY(1)}}
+@keyframes thinkspin{0%,30%{rotate:0deg}60%{rotate:200deg}100%{rotate:360deg}}
+@media(prefers-reduced-motion:reduce){.think,.think i{animation:none!important}}
+
+.logo{background:#fff;border:2px solid var(--ink);border-radius:50%;width:28px;height:28px;position:relative}
+.logo .lface{display:grid;place-items:center;width:100%;height:100%}.logo .lface svg{width:70%;height:70%}
+.logo .think{display:none;color:var(--ink);position:absolute;left:50%;top:50%;margin:-9px 0 0 -9px}
+body.busy .logo .lface{display:none}body.busy .logo .think{display:inline-block}
+
+.av{position:relative}
+.av img.net{display:none}
+.av.web{background:#fff!important;border:1px solid var(--line);box-shadow:none}
+.av.web svg{display:none}
+.av.web img.net{display:block;width:62%;height:62%;object-fit:contain;margin:auto;position:absolute;inset:0}
+
+.pv{position:fixed;inset:0;background:rgba(15,15,15,.45);z-index:200;display:grid;place-items:center;padding:20px}
+.pv-box{width:min(1100px,100%);height:min(780px,100%);background:#fff;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.pv-h{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px;background:var(--side)}
+.pv-h span{color:var(--faint)}.pv-h .grow{flex:1}
+.pv-h button{font-size:12.5px;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:#fff}
+.pv-box iframe{flex:1;border:0;width:100%;background:#fff}
+.logo{background:#37352f!important;border:none!important;border-radius:8px!important;color:#fff;width:28px;height:28px}
+.logo .lface{font:700 16px/1 -apple-system,Arial,sans-serif}
+
+/* thinking: glow, colour drift, shimmering stage text */
+.typing.thinking>.think{color:var(--accent);filter:drop-shadow(0 0 3px color-mix(in srgb,currentColor 55%,transparent))}
+.typing.thinking>.think::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:1.5px solid currentColor;opacity:0;animation:thinkpulse var(--dur) ease-out infinite}
+body.busy .typing.thinking>.think{animation:thinkspin var(--dur) cubic-bezier(.65,0,.35,1) infinite,thinkhue 5s linear infinite}
+.typing.thinking .tt{background:linear-gradient(90deg,var(--faint) 30%,var(--ink) 50%,var(--faint) 70%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shim 2.2s linear infinite}
+@keyframes thinkpulse{0%,55%{opacity:0;transform:scale(.7)}62%{opacity:.5}100%{opacity:0;transform:scale(1.25)}}
+@keyframes thinkhue{to{filter:drop-shadow(0 0 3px currentColor) hue-rotate(360deg)}}
+@keyframes shim{from{background-position:120% 0}to{background-position:-120% 0}}
+/* polish + performance */
+.msg{content-visibility:auto;contain-intrinsic-size:auto 80px}
+.btn,button{transition:transform .12s ease,background .15s ease,filter .15s ease}
+button:active{transform:scale(.97)}
+#hero{animation:heroin .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes heroin{from{opacity:0;transform:translateY(12px) scale(.98)}}
+#pop.open{animation:popin .18s ease-out}
+@keyframes popin{from{opacity:0;transform:translateY(4px) scale(.98)}}
+.sug:hover,.suggest>*:hover{transform:translateX(2px)}
+.fc{animation:pop .3s ease}
+.logo .think{color:#fff!important;filter:none}
+.logo .lface{display:grid;place-items:center;width:100%;height:100%}
+.logo .think::after{display:none}
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="sidebar" id="sidebar">
-    <div class="ws"><div class="logo">S</div>Solution.AI</div>
+    <div class="ws"><div class="logo" id="siteLogo"></div>Solution.AI</div>
     <button class="nav active" data-view="chat" id="newChat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>New AI chat</button>
     <button class="nav" data-view="plans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>Check plans</button>
     <button class="nav" id="openSettings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
@@ -270,6 +340,7 @@ button{background:none;border:none;cursor:pointer;text-align:left}
 
 <div class="overlay" id="overlay"><div class="modal"><div class="m-nav" id="mNav"></div><div class="m-body" id="mBody"></div><button class="m-close" id="mClose">✕</button></div></div>
 <input type="file" id="brainFile" accept=".md,.txt,.json,text/*" style="display:none">
+<input type="file" id="logoIn" accept="image/*" style="display:none">
 <div class="toast" id="toast"></div>
 <script type="text/plain" id="brainDefault"># Solution.AI Brain
 Version 1.0 · Knowledge file for the Solution agent. Keep this file next to solution-ai.html. Edit it freely: every "##" heading is one knowledge section.
@@ -413,7 +484,7 @@ Oceania: Australia Canberra, New Zealand Wellington.
 
 ## AI landscape
 - Large language models (LLMs) predict text from patterns learned on huge datasets. They can write, explain, translate, summarize and code, but they can be wrong with confidence, so important facts should be verified.
-- Major model families available on Solution.AI: Claude (Anthropic: Fable, Opus, Sonnet, Haiku tiers), GPT (OpenAI), Gemini (Google), Grok (listed under SpaceX). Larger or "Pro/Opus/Ultra" tiers are usually stronger but slower and costlier. "Flash/Haiku/mini/Fast" tiers are faster and cheaper.
+- Major model families available on Solution.AI: Claude (Anthropic: Fable, Opus, Sonnet, Haiku tiers), GPT (OpenAI), Gemini (Google), Grok (listed under SpaceX). GLM (Z.ai) and MiMo (Xiaomi) can be connected as API models. Larger or "Pro/Opus/Ultra" tiers are usually stronger but slower and costlier. "Flash/Haiku/mini/Fast" tiers are faster and cheaper.
 - Auto mode chooses a model for each message. ApiModels are models the user connected with their own API key.
 - Tips for good prompts: give context, state the goal, give examples, specify format and length, and say what to avoid.
 - Tokens are pieces of text (about 4 characters of English per token). Context window is how much text a model can consider at once.
@@ -435,7 +506,11 @@ Oceania: Australia Canberra, New Zealand Wellington.
 - When the user asks for a file (code, web page, text document, CSV, JSON, config, script), put the complete content of each file in its own fenced code block and give the file name in the opening fence, for example ```html file:index.html.
 - Write complete files. Never shorten with placeholders like "..." or "rest of the code here".
 - Solution.AI shows a Download button for every such block, and a .zip button when a reply has several files.
-- You cannot create binary formats (docx, pdf, images, xlsx). Say so and offer the closest text format (.md, .html, .csv, .svg).
+- Word: ```docx file:report.docx with Markdown content (headings, bullets, bold). Excel: ```xlsx file:data.xlsx with CSV content. PDF: ```pdf file:doc.pdf with Markdown content; the user saves it through the print dialog. Images: ```png file:pic.png with only base64 data, or SVG as text.
+- ZIP: ```zip file:project.zip followed by one file path per line (an empty block packs all files of the reply). Folders are allowed, for example file:css/style.css.
+- Websites and projects: when asked, write every file (index.html, css/style.css, js/app.js, README.md) and finish with a ```zip block. Solution can also scaffold a landing page, portfolio, to-do app, calculator, game, Python or Node starter on its own.
+- Not supported: pptx, video, audio. Say so and offer the closest format.
+- For a site, app, game or project, deliver a complete working project: all files in separate blocks plus a zip block.
 - Keep file names short, lowercase, with the right extension.
 
 ## Mini FAQ
@@ -443,7 +518,123 @@ Oceania: Australia Canberra, New Zealand Wellington.
 - What are the plans? Startup is $10 per month, Max is $25 per month, Ultra is $40 per month.
 - How do I add my own model? Settings, API Models, Add API model. Your key stays in this browser.
 - What is the Brain? A knowledge file the agent can use. You can edit it, replace it or turn it off in Settings, Brain.
-- How do I download files the agent writes? Every file in a reply has a Download button. Several files can be saved together with Download all (.zip).</script>
+
+## Scientists and inventors
+- Isaac Newton (1643 to 1727): laws of motion, universal gravitation, calculus (together with Leibniz).
+- Albert Einstein (1879 to 1955): special relativity (1905), general relativity (1915), Nobel Prize 1921 for the photoelectric effect.
+- Marie Curie (1867 to 1934): radioactivity, Nobel Prizes in Physics (1903) and Chemistry (1911).
+- Charles Darwin (1809 to 1882): evolution by natural selection, On the Origin of Species (1859).
+- Galileo Galilei (1564 to 1642): telescope astronomy, moons of Jupiter, support for the heliocentric model.
+- Nikola Tesla (1856 to 1943): alternating current systems and the induction motor.
+- Thomas Edison (1847 to 1931): practical light bulb, phonograph, more than a thousand patents.
+- Alan Turing (1912 to 1954): theory of computation, the Turing machine, wartime codebreaking, the Turing test.
+- Ada Lovelace (1815 to 1852): wrote the first published algorithm for Babbage's Analytical Engine.
+- Dmitri Mendeleev (1834 to 1907): the periodic table (1869).
+- Louis Pasteur (1822 to 1895): germ theory, pasteurization, vaccines. Alexander Fleming (1881 to 1955): discovered penicillin in 1928.
+- Stephen Hawking (1942 to 2018): black hole radiation, A Brief History of Time. Tim Berners-Lee: invented the World Wide Web (1989).
+- Konstantin Tsiolkovsky (1857 to 1935): pioneer of rocket science. Al-Khwarizmi (about 780 to 850): algebra, the word "algorithm" comes from his name.
+- Al-Farabi (about 872 to 950): philosopher and scientist from the Otrar region, today's Kazakhstan.
+
+## Inventions and technology timeline
+- About 3500 BCE: the wheel in Mesopotamia. About 105 CE: paper in China (traditional date, Cai Lun).
+- 1440s: printing press with movable type in Europe (Gutenberg). Early 1600s: the telescope.
+- 1769: James Watt's improved steam engine. 1876: the telephone (Bell). 1879: practical incandescent light bulb (Edison).
+- 1886: first practical automobile (Benz). 1903: first powered airplane flight (Wright brothers).
+- 1928: penicillin. 1947: the transistor. 1958: the integrated circuit. 1971: the microprocessor and early email.
+- 1969: ARPANET. 1983: TCP/IP becomes the network standard. 1989: the World Wide Web. 1991: Linux kernel started by Linus Torvalds.
+- 1998: Google founded. 2004: Facebook. 2007: iPhone. 2009: Bitcoin. 2017: the Transformer architecture ("Attention Is All You Need"). 2022: ChatGPT released.
+
+## Organizations
+- United Nations (1945, headquarters New York). European Union (Maastricht Treaty 1993, euro banknotes 2002). NATO (1949). World Health Organization (1948, Geneva).
+- UNESCO (1945). IMF and World Bank (1944, Bretton Woods). World Trade Organization (1995). OPEC (1960). International Olympic Committee (1894).
+- Space agencies: NASA (1958), ESA (1975), Roscosmos, CNSA (China), ISRO (India), JAXA (Japan).
+
+## Economy and money
+- GDP is the total value of goods and services a country produces in a period. Inflation is a general rise in prices. An interest rate is the price of borrowing money.
+- Currency codes: USD US dollar, EUR euro, GBP pound sterling, JPY yen, CNY yuan, KZT tenge, RUB ruble, TRY lira, INR rupee, CHF Swiss franc.
+- Stocks are ownership shares, bonds are loans, an ETF is a basket of assets traded like a stock. Diversification lowers risk. Rule of 72: years to double money is about 72 divided by the yearly percent return.
+- Bitcoin was created in 2009 by the pseudonymous Satoshi Nakamoto, uses a blockchain, and has a fixed supply of 21 million coins.
+- A simple budget idea is 50 percent needs, 30 percent wants, 20 percent savings. This is general information, not financial advice. Never state exchange rates or prices as current.
+
+## Literature, art and music
+- Writers: Shakespeare (Hamlet, Macbeth), Cervantes (Don Quixote), Dante (Divine Comedy), Goethe (Faust), Pushkin (Eugene Onegin), Tolstoy (War and Peace, Anna Karenina), Dostoevsky (Crime and Punishment), Chekhov, Bulgakov (The Master and Margarita), Orwell (1984), Tolkien (The Lord of the Rings).
+- Kazakh and Central Asian literature: Abai Kunanbaiuly (1845 to 1904, poet and thinker, Book of Words), Mukhtar Auezov (novel Abai Zholy), Chinghiz Aitmatov (Kyrgyz writer, Jamilya, The Day Lasts More Than a Hundred Years).
+- Painters: Leonardo da Vinci (Mona Lisa, The Last Supper), Michelangelo (Sistine Chapel ceiling), Rembrandt, Van Gogh (The Starry Night), Picasso (Guernica), Monet (Impressionism).
+- Composers: Bach, Mozart, Beethoven (nine symphonies), Tchaikovsky (Swan Lake), Chopin.
+
+## Sports and games
+- Football (soccer): 11 players per team, 90 minutes, the FIFA World Cup is held every 4 years. Basketball: 5 players per team. Marathon distance: 42.195 km.
+- The modern Olympic Games began in 1896. Summer and winter Games are each held every 4 years. Tennis Grand Slams: Australian Open, French Open, Wimbledon, US Open.
+- Chess: 64 squares, 16 pieces per side, checkmate wins. Go and chess are classic strategy games.
+
+## Animals and nature
+- Largest animal: the blue whale (up to about 30 m). Largest land animal: the African elephant. Fastest land animal: the cheetah (about 100 to 120 km/h). Tallest animal: the giraffe. Fastest animal overall: the peregrine falcon in a dive (over 300 km/h).
+- An octopus has three hearts. Honey almost never spoils. Humans share roughly 98 percent of their DNA with chimpanzees.
+- The water cycle: evaporation, condensation, precipitation, collection. Weather is short-term, climate is the long-term average. Greenhouse gases include CO2 and methane.
+- The Amazon is the largest rainforest. Coral reefs host a large share of marine species. Bees are key pollinators.
+
+## Kazakhstan quick facts
+- Capital: Astana (called Nur-Sultan from 2019 to 2022). Largest city: Almaty. Independence from the USSR: December 1991. Official language Kazakh, Russian is widely used. Currency: tenge (KZT).
+- About the ninth-largest country by area. Neighbors: Russia, China, Kyrgyzstan, Uzbekistan, Turkmenistan, and the Caspian Sea coast. The whole country uses UTC+5 since March 2024.
+- Baikonur Cosmodrome is where Yuri Gagarin launched in 1961. Notable places: Charyn Canyon, Lake Balkhash, the Altai and Tian Shan mountains, the former Aral Sea. Uralsk (Oral) is a city in the west on the Ural River.
+
+## Rivers, mountains and extremes
+- Highest peaks by continent: Everest (Asia, 8,849 m), Aconcagua (South America, 6,961 m), Denali (North America, 6,190 m), Kilimanjaro (Africa, 5,895 m), Elbrus (Europe, 5,642 m), Vinson (Antarctica, 4,892 m), Puncak Jaya or Kosciuszko for Oceania depending on definition. Mont Blanc (4,808 m) is the highest peak in the Alps.
+- Longest rivers: Nile and Amazon (disputed order), Yangtze (longest in Asia), Mississippi-Missouri, Yenisei, Volga (longest in Europe), Danube.
+- Largest island: Greenland. Largest lake by area: Caspian Sea. Deepest lake: Baikal. Lowest land point: the shore of the Dead Sea (about 430 m below sea level). Largest freshwater lake by area: Lake Superior.
+
+## Math toolbox
+- Derivatives: d/dx of x^n is n·x^(n−1); of sin x is cos x; of cos x is −sin x; of e^x is e^x; of ln x is 1/x. Integral of x^n is x^(n+1)/(n+1) + C for n not equal to −1; integral of 1/x is ln|x| + C.
+- Trigonometry: sin²x + cos²x = 1; tan x = sin x / cos x; sin 30° = 0.5; cos 60° = 0.5; sin 45° = √2/2; law of cosines c² = a² + b² − 2ab·cos C.
+- Logarithms: log(xy) = log x + log y; log(x/y) = log x − log y; ln e = 1; log10 1000 = 3; log2 1024 = 10.
+- Statistics: mean, median, mode, variance, standard deviation. In a normal distribution about 68 percent of values lie within 1 standard deviation, 95 percent within 2, 99.7 percent within 3.
+- Counting: n! = n·(n−1)·…·1; combinations C(n,k) = n! / (k!·(n−k)!); permutations P(n,k) = n! / (n−k)!.
+- Series: arithmetic sum = n·(first + last) / 2; geometric sum = a·(1 − r^n) / (1 − r).
+- Number systems: binary 1010 = 10; hexadecimal FF = 255; 2^16 = 65,536; 2^32 = 4,294,967,296.
+- Volumes: cylinder π·r²·h, cone ⅓·π·r²·h, sphere 4/3·π·r³, box l·w·h. Area of a trapezoid = (a + b)/2 · h.
+
+## Code snippets and web basics
+- Minimal HTML page: doctype html, html lang en, head with meta charset utf-8, meta viewport and a title, then a body. Always include the viewport meta tag for phones.
+- CSS centering: display flex; align-items center; justify-content center. CSS grid: display grid; grid-template-columns repeat(3, 1fr); gap 16px. Responsive: use @media (max-width: 760px).
+- JavaScript: const data = await (await fetch(url)).json(); arr.map(f), arr.filter(f), arr.reduce(f, start); localStorage.setItem(key, JSON.stringify(value)); JSON.parse(localStorage.getItem(key)).
+- Python: with open("f.txt") as f: text = f.read(); squares = [x*x for x in range(10)]; import json; json.loads(s); def name(args): return value.
+- SQL: SELECT col FROM table WHERE x > 5 ORDER BY col LIMIT 10; INSERT INTO t (a, b) VALUES (1, 2); UPDATE t SET a = 1 WHERE id = 3; JOIN combines rows from two tables on a key.
+- Git: git init, git add ., git commit -m "message", git push, git pull, git checkout -b branch, git status, git log --oneline.
+- Regular expressions: \d digit, \w word character, \s space, + one or more, * zero or more, ? optional, ^ start, $ end, [a-z] range, (…) group.
+- HTTP status codes: 200 OK, 201 Created, 301 Moved, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests, 500 Server Error.
+- Big-O: O(1) constant, O(log n) binary search, O(n) loop, O(n log n) good sorting, O(n²) nested loops.
+
+## Cooking and household
+- Pasta usually needs 8 to 12 minutes in salted boiling water. White rice cooks in about 15 to 18 minutes, roughly 1 part rice to 2 parts water. Eggs: about 6 minutes soft-boiled, 10 to 12 minutes hard-boiled.
+- A moderate oven is about 180 °C (350 °F). Baking powder already contains acid, baking soda needs an acid in the recipe. Refrigerate cooked food within 2 hours.
+- Safe internal temperatures: chicken 74 °C (165 °F), ground meat 71 °C (160 °F), fish 63 °C (145 °F).
+- Never mix bleach with ammonia or acids. Keep knives sharp, a sharp knife is safer. Wash hands and boards after raw meat.
+
+## Time zones and calendars
+- UTC offsets in winter: London UTC+0, Paris and Berlin UTC+1, Istanbul and Moscow UTC+3, Kazakhstan UTC+5, India UTC+5:30, China UTC+8, Japan UTC+9, New York UTC−5, Los Angeles UTC−8. Many countries shift one hour in summer (daylight saving time).
+- The Gregorian calendar has 365 days, leap years have 366. A leap year occurs every 4 years except century years not divisible by 400. There are 86,400 seconds in a day and 8,760 hours in a common year.
+- Nowruz is celebrated around March 21 in Kazakhstan and many other countries. New Year is January 1.
+
+## Problem solving and thinking tools
+- First principles: break a problem into basic truths and rebuild. Pareto principle: about 80 percent of effects come from 20 percent of causes. Occam's razor: prefer the simplest explanation that fits the facts.
+- Fermi estimation: split a big unknown into rough numbers you can guess and multiply them. 5 Whys: ask why repeatedly to find a root cause. Eisenhower matrix: sort tasks by urgent and important.
+- Rubber duck debugging: explain the code line by line to find the bug. Pre-mortem: imagine the project failed and list why.
+- Common biases: confirmation bias, anchoring, survivorship bias, sunk cost fallacy. Check sources, compare at least two, and separate facts from opinions.
+
+## Quick reference facts
+- Earth to Moon: about 384,400 km. Earth to Sun: about 149.6 million km (1 astronomical unit). The Sun's light reaches Earth in about 8 minutes 20 seconds.
+- Normal human body temperature is about 36.6 to 37 °C. Normal resting blood pressure is about 120/80 mmHg. The human body is about 60 percent water. Adults have 32 teeth including wisdom teeth.
+- There are 118 known chemical elements. Earth has 1 Moon, Mars has 2 small moons. Pluto is a dwarf planet. Sound is about 343 m/s in air, light about 299,792 km/s.
+- A byte has 8 bits. A kilobyte is 1,000 bytes in SI units (1,024 in common computing use). Wi-Fi and Bluetooth use radio waves. A pixel is a single dot of a screen image.
+
+## Useful phrases
+- Thank you: English "Thank you", Russian "Спасибо", Kazakh "Рахмет", Turkish "Teşekkürler", Spanish "Gracias", French "Merci", German "Danke".
+- Yes and no: Russian "Да" and "Нет", Kazakh "Иә" and "Жоқ", Spanish "Sí" and "No", French "Oui" and "Non".
+- Hello: Russian "Здравствуйте" or "Привет", Kazakh "Сәлем" or "Сәлеметсіз бе", Turkish "Merhaba". Goodbye: Russian "До свидания", Kazakh "Қош болыңыз", Spanish "Adiós".
+- Please: Russian "Пожалуйста", Kazakh "Өтінемін", English "Please". Sorry: Russian "Извините", Kazakh "Кешіріңіз", English "Sorry".
+- How do I download files the agent writes? Every file in a reply has a Download button. Several files can be saved together with Download all (.zip).
+- What is the Solution model? It is the built-in agent that uses this Brain. Offline it answers from the Brain (facts, calculator, date and time). With an engine, which is any API model the user connected, it runs the Brain on top of that model. Set it in Settings, Solution.
+- Which models can power Solution? Any API model, for example GLM 5.3 (Z.ai), MiMo V2.6 Pro (Xiaomi) or Gemini 3.8 Flash (Google). Use Quick add in Settings, Solution.</script>
 
 <script>
 /* ================= CONFIG ================= */
@@ -453,7 +644,7 @@ const PLANS=[
   {id:'ultra',name:'Ultra',price:40,rank:3,feats:['Everything in Max','Newest & most powerful models','Highest limits','Early access to new releases']},
 ];
 const PROVIDERS=[
-  {id:'anthropic',name:'Anthropic',color:['#e8875a','#c4552d'],icon:'star',models:[
+  {id:'anthropic',name:'Anthropic',color:['#e8875a','#c4552d'],icon:'arch',models:[
     {n:'Claude Fable 5.1',d:'Most capable, deep reasoning',plan:3},
     {n:'Claude Opus 5.5',d:'Flagship for hard tasks',plan:2},
     {n:'Claude Sonnet 5.5',d:'Smart and efficient',plan:1},
@@ -462,16 +653,31 @@ const PROVIDERS=[
     {n:'Grok 5',d:'Frontier model with real-time knowledge',plan:3},
     {n:'Grok 4.1',d:'Strong all-rounder',plan:2},
     {n:'Grok 4 Fast',d:'Quick answers, low latency',plan:1}]},
-  {id:'gemini',name:'Gemini',color:['#5b8cff','#a45cff'],icon:'spark',models:[
+  {id:'gemini',name:'Gemini',color:['#5b8cff','#a45cff'],icon:'twins',models:[
     {n:'Gemini 3 Ultra',d:'Largest multimodal model',plan:3},
     {n:'Gemini 3 Pro',d:'Advanced reasoning & long context',plan:2},
     {n:'Gemini 3 Flash',d:'Fast and affordable',plan:1}]},
-  {id:'chatgpt',name:'ChatGPT',color:['#1fb38a','#0d7f63'],icon:'knot',models:[
+  {id:'chatgpt',name:'ChatGPT',color:['#1fb38a','#0d7f63'],icon:'bubble',models:[
     {n:'GPT-5.5 Pro',d:'Maximum reasoning power',plan:3},
     {n:'GPT-5.5',d:'Flagship general model',plan:2},
     {n:'GPT-5 mini',d:'Light and quick',plan:1}]},
 ];
+PROVIDERS.push(
+  {id:'meta',name:'Meta',color:['#3b82f6','#1d4ed8'],icon:'wave',models:[{n:'Llama 4 Maverick',d:'Open flagship, multimodal',plan:2},{n:'Llama 4 Scout',d:'Very long context',plan:1},{n:'Llama 3.3 70B',d:'Reliable open model',plan:1}]},
+  {id:'mistral',name:'Mistral',color:['#ff8a1f','#e5530a'],icon:'wave',models:[{n:'Mistral Large 3',d:'Top model from Mistral',plan:2},{n:'Mistral Medium 3',d:'Balanced quality and cost',plan:1},{n:'Codestral',d:'Specialised for code',plan:1}]},
+  {id:'deepseek',name:'DeepSeek',color:['#4d6bfe','#2a3fb8'],icon:'orbit',models:[{n:'DeepSeek R2',d:'Deep step-by-step reasoning',plan:2},{n:'DeepSeek V3.2',d:'Strong general model',plan:1}]},
+  {id:'qwen',name:'Qwen',color:['#7c5cff','#4c2fd0'],icon:'cube',models:[{n:'Qwen3 Max',d:'Alibaba flagship',plan:2},{n:'Qwen3 Coder',d:'Coding agent model',plan:1},{n:'Qwen3 Flash',d:'Quick and light',plan:1}]},
+  {id:'glm',name:'GLM (Z.ai)',color:['#4f46e5','#312e81'],icon:'zee',models:[{n:'GLM 5.3',d:'Zhipu flagship, agentic tasks',plan:2},{n:'GLM 5 Air',d:'Lightweight and fast',plan:1}]},
+  {id:'mimo',name:'MiMo (Xiaomi)',color:['#ff7a1a','#e8590c'],icon:'emm',models:[{n:'MiMo V2.6 Pro',d:'Reasoning model, 1M context',plan:2},{n:'MiMo V2 Flash',d:'Fast everyday model',plan:1}]},
+  {id:'kimi',name:'Kimi',color:['#111827','#000000'],icon:'orbit',models:[{n:'Kimi K2.5',d:'Moonshot agentic model',plan:2},{n:'Kimi K2 Turbo',d:'Faster and cheaper',plan:1}]},
+  {id:'perplexity',name:'Perplexity',color:['#20808d','#0f5560'],icon:'cube',models:[{n:'Sonar Pro',d:'Answers with web sources',plan:2},{n:'Sonar',d:'Quick search answers',plan:1}]},
+  {id:'cohere',name:'Cohere',color:['#39594d','#1f3a30'],icon:'wave',models:[{n:'Command A',d:'Enterprise assistant',plan:2},{n:'Command R',d:'Retrieval and tools',plan:1}]},
+  {id:'nvidia',name:'NVIDIA',color:['#76b900','#4c7a00'],icon:'cube',models:[{n:'Nemotron Ultra',d:'Large reasoning model',plan:2},{n:'Nemotron Nano',d:'Small and efficient',plan:1}]},
+  {id:'amazon',name:'Amazon',color:['#ff9900','#c46f00'],icon:'wave',models:[{n:'Nova Premier',d:'Most capable Nova model',plan:2},{n:'Nova Lite',d:'Low-cost multimodal',plan:1}]},
+  {id:'microsoft',name:'Microsoft',color:['#2563eb','#1e3a8a'],icon:'cube',models:[{n:'Phi-5',d:'Small model, big reasoning',plan:1},{n:'MAI-1',d:'Microsoft in-house model',plan:2}]}
+);
 const AUTO={id:'auto',name:'Auto',color:['#37352f','#37352f'],icon:'auto'};
+const SOLUTION={id:'solution',name:'Solution',color:['#2383e2','#5b3fe0'],icon:'solution'};
 const API_TYPES={
   openai:{label:'OpenAI-compatible (OpenAI, xAI, OpenRouter, Groq, local…)',base:'https://api.openai.com/v1',color:['#1fb38a','#0d7f63']},
   anthropic:{label:'Anthropic',base:'https://api.anthropic.com/v1',color:['#e8875a','#c4552d']},
@@ -479,19 +685,29 @@ const API_TYPES={
 };
 const THEMES=['#2383e2','#7c3aed','#0f9d77','#e2574c','#37352f'];
 const ICONS={
-  star:'<path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+  solution:'<path d="M5.5 12.5l6.5-6.5 6.5 6.5M5.5 18.5L12 12l6.5 6.5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  arch:'<path d="M5 19v-7a7 7 0 0 1 14 0v7" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="12" cy="13.2" r="2" fill="#fff"/>',
   rocket:'<path d="M12 2c3 2.5 4.5 6 4.5 10l-2 3.5h-5L7.5 12C7.5 8 9 4.5 12 2z" fill="#fff"/><path d="M8.5 16l-2.5 4 4-1.5M15.5 16l2.5 4-4-1.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linejoin="round"/>',
-  spark:'<path d="M12 2C12.8 8 16 11.2 22 12c-6 .8-9.2 4-10 10-.8-6-4-9.2-10-10 6-.8 9.2-4 10-10z" fill="#fff"/>',
-  knot:'<circle cx="12" cy="12" r="6.5" stroke="#fff" stroke-width="2.4" fill="none"/><circle cx="12" cy="12" r="2" fill="#fff"/>',
+  twins:'<circle cx="9" cy="12" r="5" stroke="#fff" stroke-width="2.2" fill="none"/><circle cx="15" cy="12" r="5" stroke="#fff" stroke-width="2.2" fill="none"/>',
+  bubble:'<path d="M5.5 5h13A1.5 1.5 0 0 1 20 6.5v8a1.5 1.5 0 0 1-1.5 1.5H12l-4.5 3.5V16h-2A1.5 1.5 0 0 1 4 14.5v-8A1.5 1.5 0 0 1 5.5 5z" stroke="#fff" stroke-width="2" fill="none" stroke-linejoin="round"/><circle cx="8.5" cy="10.5" r="1.15" fill="#fff"/><circle cx="12" cy="10.5" r="1.15" fill="#fff"/><circle cx="15.5" cy="10.5" r="1.15" fill="#fff"/>',
+  zee:'<path d="M6.5 7h11l-11 10h11" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  emm:'<path d="M5.5 18V7l6.5 7 6.5-7v11" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
   auto:'<path d="M13 2L5 14h6l-1 8 8-12h-6z" fill="#fff"/>',
   key:'<circle cx="8" cy="12" r="3.6" stroke="#fff" stroke-width="2.2" fill="none"/><path d="M11.6 12H21M17 12v3.5M20 12v2.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>',
   api:'<path d="M8 7l-5 5 5 5M16 7l5 5-5 5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
   git:'<circle cx="6" cy="6" r="2.4" fill="#fff"/><circle cx="6" cy="18" r="2.4" fill="#fff"/><circle cx="18" cy="9" r="2.4" fill="#fff"/><path d="M6 8.4v7.2M18 11.4c0 3-6 2-12 4.2" stroke="#fff" stroke-width="2" fill="none"/>',
+  wave:'<path d="M3 15c3-8 6-8 9 0s6 8 9 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>',
+  cube:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z M12 12l8-4.5M12 12L4 7.5M12 12v9" stroke="#fff" stroke-width="1.9" fill="none" stroke-linejoin="round"/>',
+  orbit:'<circle cx="12" cy="12" r="3" fill="#fff"/><ellipse cx="12" cy="12" rx="9" ry="4" stroke="#fff" stroke-width="1.8" fill="none" transform="rotate(-30 12 12)"/>',
 };
+/* names used by chats saved with the first icon set */
+ICONS.star=ICONS.arch;ICONS.spark=ICONS.twins;ICONS.knot=ICONS.bubble;
 const FACE='<svg viewBox="0 0 24 24" fill="none"><circle cx="8.5" cy="10" r="1.5" fill="#37352f"/><circle cx="15.5" cy="10" r="1.5" fill="#37352f"/><path d="M8 14.5c1 1.6 2.3 2.3 4 2.3s3-.7 4-2.3" stroke="#37352f" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const faceEl=(px)=>`<div class="face" style="width:${px}px;height:${px}px;border-width:${px>40?3:2}px">${FACE}</div>`;
-const avRaw=(c,icon,cls='')=>`<div class="av ${cls}" style="background:linear-gradient(135deg,${c[0]},${c[1]})"><svg viewBox="0 0 24 24">${ICONS[icon]}</svg></div>`;
-const avatar=(p,cls)=>avRaw(p.color,p.icon,cls);
+const WEB_DOM={anthropic:'anthropic.com',spacex:'x.ai',gemini:'gemini.google.com',chatgpt:'chatgpt.com',meta:'llama.com',mistral:'mistral.ai',deepseek:'deepseek.com',qwen:'qwen.ai',glm:'z.ai',mimo:'mimo.mi.com',kimi:'kimi.com',perplexity:'perplexity.ai',cohere:'cohere.com',nvidia:'nvidia.com',amazon:'aws.amazon.com',microsoft:'microsoft.com',openrouter:'openrouter.ai',github:'github.com'};
+const webLogo=pid=>S.webIcons&&WEB_DOM[pid]?'https://www.google.com/s2/favicons?sz=128&domain='+WEB_DOM[pid]:'';
+const avRaw=(c,icon,cls='',pid)=>{const lg=pid&&S.logos&&S.logos[pid];if(lg)return `<div class="av ${cls} logo-img"><img src="${lg}" alt=""></div>`;const w=webLogo(pid);return `<div class="av ${cls}" style="background:linear-gradient(135deg,${c[0]},${c[1]})"><svg viewBox="0 0 24 24">${ICONS[icon]||ICONS.auto}</svg>${w?`<img class="net" alt="" referrerpolicy="no-referrer" src="${w}" onload="if(this.naturalWidth>16)this.parentNode.classList.add('web');else this.remove()" onerror="this.remove()">`:''}</div>`};
+const avatar=(p,cls)=>avRaw(p.color,p.icon,cls,p.id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CHECK='<svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 
@@ -499,7 +715,7 @@ const CHECK='<svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentCol
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const S={plan:LS.get('up_plan',0),name:LS.get('up_name',''),theme:LS.get('up_theme',0),api:LS.get('up_apimodels',[]),gh:LS.get('up_gh',null),repo:LS.get('up_repo',null),
   chats:LS.get('up_chats',[]),sel:LS.get('up_sel',{provider:'auto',model:'Auto'}),cur:null,
-  brainOn:LS.get('up_brainOn',true),brainCustom:LS.get('up_brain',null),brainFile:null};
+  brainOn:LS.get('up_brainOn',true),solution:Object.assign({engine:'',style:'balanced'},LS.get('up_solution',{})),logos:LS.get('up_logos',{}),webIcons:LS.get('up_webIcons',true),brainCustom:LS.get('up_brain',null),brainFile:null};
 const $=id=>document.getElementById(id);
 const planLabel=()=>S.plan?PLANS[S.plan-1].name:'Free';
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2400)}
@@ -514,19 +730,8 @@ function brainSource(){return S.brainCustom?'Custom (edited / uploaded)':S.brain
 let _bt=null,_bs=[];
 function brainSections(){const x=brainText();if(x===_bt)return _bs;_bt=x;_bs=x.split(/\n(?=## )/).map(s=>{const m=s.match(/^##\s+(.*)\n?([\s\S]*)$/);return m?{h:m[1].trim(),b:m[2].trim(),hl:m[1].toLowerCase(),bl:m[2].toLowerCase()}:null}).filter(Boolean);return _bs}
 const STOP=new Set('the and for what who how why are you can does that this with from about tell give please have has was were will would should could which into your solution'.split(' '));
-function brainAnswer(q){
-  const toks=(q.toLowerCase().match(/[a-z0-9]{3,}/g)||[]).filter(t=>!STOP.has(t));
-  let best=null,bs=0;
-  for(const s of brainSections()){
-    const h=s.hl,b=s.bl;let sc=0;
-    for(const t of toks){if(h.includes(t))sc+=5;let i=0,c=0;while(c<3&&(i=b.indexOf(t,i))>=0){c++;i+=t.length}sc+=c}
-    if(sc>bs){bs=sc;best=s}
-  }
-  if(best&&bs>=3){const body=best.b.length>1300?best.b.slice(0,1300).replace(/\s+\S*$/,'')+' …':best.b;return `**${best.h}** (from the Brain)\n\n${body}`}
-  return null;
-}
-function brainSystem(){
-  if(!S.brainOn)return '';
+function brainSystem(force){
+  if(!S.brainOn&&!force)return '';
   return `You are Solution, the AI agent of Solution.AI. Below is your Brain: a knowledge and behavior file. Follow its identity and style rules and use its facts when relevant. It is static and may be outdated; never invent facts beyond it.\n\n<brain>\n${brainText()}\n</brain>`;
 }
 
@@ -541,9 +746,12 @@ document.querySelectorAll('.nav[data-view]').forEach(b=>b.onclick=()=>{if(b.id==
 $('menu').onclick=()=>$('sidebar').classList.toggle('open');
 
 /* ================= POPOVERS (model / plus) ================= */
-const apiProv=m=>({color:API_TYPES[m.type].color,icon:'key',name:m.name});
+const apiIc=m=>[m.color||API_TYPES[m.type].color,m.icon||'key',m.preset];
+const apiAv=(m,cls)=>avRaw(m.color||API_TYPES[m.type].color,m.icon||'key',cls,m.preset);
+const apiProv=m=>({color:m.color||API_TYPES[m.type].color,icon:m.icon||'key',name:m.name,id:m.preset});
 function curProvider(){
   if(S.sel.provider==='auto')return AUTO;
+  if(S.sel.provider==='solution')return SOLUTION;
   if(S.sel.provider==='api'){const m=S.api.find(x=>x.id===S.sel.model);return m?apiProv(m):AUTO}
   return PROVIDERS.find(p=>p.id===S.sel.provider)||AUTO;
 }
@@ -563,7 +771,7 @@ function openPop(kind){
   const pop=$('pop');
   if(kind==='model'){
     const api=autoApi();
-    let h=`<div class="mrow" data-auto="1">${avatar(AUTO,'lg')}<div class="grow"><div class="t">Auto</div><div class="d">${api.length?'Routes to your ApiModels: '+esc(api.map(m=>m.name).join(', ')):'Picks the best model for each message'}</div></div>${S.sel.provider==='auto'?CHECK:''}</div><div class="sep"></div>`;
+    let h=`<div class="mrow" data-auto="1">${avatar(AUTO,'lg')}<div class="grow"><div class="t">Auto</div><div class="d">${api.length?'Routes to your ApiModels: '+esc(api.map(m=>m.name).join(', ')):'Routes to Solution (Brain). Add API models for full answers'}</div></div>${S.sel.provider==='auto'?CHECK:''}</div>${solRow()}<div class="sep"></div>`;
     PROVIDERS.forEach(p=>{
       h+=`<div class="grp">${avatar(p,'xs')}${p.name}</div>`;
       p.models.forEach(m=>{const locked=S.plan<m.plan,sel=S.sel.provider===p.id&&S.sel.model===m.n;
@@ -571,11 +779,12 @@ function openPop(kind){
     });
     h+=`<div class="sep"></div><div class="grp">${avRaw(['#0ea5e9','#14b8a6'],'api','xs')}ApiModels</div>`;
     S.api.forEach(m=>{const sel=S.sel.provider==='api'&&S.sel.model===m.id;
-      h+=`<div class="mrow" data-api="${m.id}">${avRaw(API_TYPES[m.type].color,'key','sm')}<div class="grow"><div class="t">${esc(m.name)}</div><div class="d">${esc(m.modelId)}${m.auto?' · in Auto':''}</div></div>${sel?CHECK:'<span class="tag api">API</span>'}</div>`});
+      h+=`<div class="mrow" data-api="${m.id}">${apiAv(m,'sm')}<div class="grow"><div class="t">${esc(m.name)}</div><div class="d">${esc(m.modelId)}${m.auto?' · in Auto':''}</div></div>${sel?CHECK:'<span class="tag api">API</span>'}</div>`});
     h+=`<div class="mrow" data-add="1"><div class="av sm" style="background:rgba(55,53,47,.08);color:var(--ink);font-size:15px">+</div><div class="grow"><div class="t">Add API model</div><div class="d">Use your own key — stored only in this browser</div></div></div>`;
     pop.innerHTML=h;
     pop.querySelectorAll('.mrow').forEach(e=>e.onclick=()=>{
       if(e.dataset.auto)S.sel={provider:'auto',model:'Auto'};
+      else if(e.dataset.sol)S.sel={provider:'solution',model:'Solution'};
       else if(e.dataset.add){closePop();openSettings('api');return}
       else if(e.dataset.api)S.sel={provider:'api',model:e.dataset.api};
       else{const need=+e.dataset.plan;if(S.plan<need){toast(PLANS[need-1].name+' plan required');closePop();show('plans');return}
@@ -608,19 +817,19 @@ $('brainFile').onchange=e=>{
 };
 
 /* ================= CHAT ================= */
-const SUGGEST=['Make me a landing page (HTML file)','Explain a concept using the Brain','Write a Python script and give it as a file','Summarize a long text'];
+const SUGGEST=['Make me a landing page (HTML file)','What is 15% of 240?','Write a Python script and give it as a file','Summarize a long text'];
 const SPARK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>';
 const SEND_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 11l6-6 6 6"/></svg>';
 const STOP_SVG='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
 const FILE_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
-const TYPING='<span class="typing"><span></span><span></span><span></span></span>';
-const FILE_RULES='When the user asks you to create a file (code, web page, text document, CSV, JSON, config, script, etc.), put the complete content of each file in its own fenced code block and write the file name in the opening fence, for example ```html file:index.html. Never shorten files with placeholders like "...". The app shows a Download button for every such block and a .zip for several files. For formats you cannot write as plain text (docx, pdf, images, spreadsheets), say so and offer the closest text format (.md, .html, .csv).';
-const FILES=new Map(),TEXTS=new Map();
+const thinkHtml=px=>'<span class="think" style="--s:'+px+'px">'+Array.from({length:12},(_,k)=>'<i style="--i:'+k+'"></i>').join('')+'</span>';
+const TYPING='<span class="typing thinking">'+thinkHtml(22)+'<span class="tt">Thinking…</span></span>';
+const FILE_RULES='When the user asks you to create a file, put the complete content of each file in its own fenced code block and write the file name in the opening fence, for example ```html file:index.html. Folders are allowed (file:css/style.css). When asked for a site, app, game or project, deliver a complete working project: every needed file (index.html, css, js, README, package.json, requirements.txt etc.) in separate blocks, plus a ```zip block so the user can download everything at once. Never shorten files with placeholders like "...". Supported: any text format (code, html, css, json, csv, md, svg, txt...); Word .docx (```docx file:report.docx, content in Markdown); Excel .xlsx (```xlsx file:data.xlsx, content as CSV); PDF (```pdf file:doc.pdf, content in Markdown, the user saves it through the print dialog); images PNG/JPG/GIF as base64 (```png file:pic.png then only the base64); ZIP archives (```zip file:project.zip then one file path per line; an empty block means all files of the reply). The app shows a Download button for every block and a .zip for several files. When asked for a website or project, create all needed files (index.html, css/style.css, js/app.js, README.md) and a ```zip block for the whole project. Not supported: pptx, video, audio. When asked for a website, app or project, build it completely: a folder structure (index.html, css/style.css, js/app.js, README.md with run steps), working code with no placeholders, then a final ```zip block named after the project so the user gets one archive. Offer to extend it afterwards.';
+const FILES=new Map(),TEXTS=new Map(),RECIPES=new Map();
 let MID=0,ctl=null;
 
-function greet(){const h=new Date().getHours();return h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening'}
 function renderHero(){
-  $('hero').innerHTML=faceEl(60)+`<h1>${greet()}${S.name?', '+esc(S.name):''}</h1>`;
+  $('hero').innerHTML='<svg class="herologo" width="60" height="60" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#37352f"/><text x="16" y="22" font-size="18" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif">S</text></svg>'+`<h1>Start?</h1>`;
   $('suggest').innerHTML=`<div class="lbl">Get started</div>`+SUGGEST.map(s=>`<button class="sug">${SPARK}${esc(s)}</button>`).join('');
 }
 $('suggest').onclick=e=>{const b=e.target.closest('.sug');if(b){$('input').value=b.textContent;updateSend();$('input').focus()}};
@@ -639,27 +848,57 @@ addEventListener('pagehide',()=>{if(saveT)flushChats()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&saveT)flushChats()});
 
 /* ---------- markdown + files ---------- */
-const MIME={html:'text/html',htm:'text/html',css:'text/css',js:'text/javascript',mjs:'text/javascript',json:'application/json',md:'text/markdown',txt:'text/plain',csv:'text/csv',xml:'application/xml',svg:'image/svg+xml',py:'text/x-python',ts:'text/typescript',yml:'text/yaml',yaml:'text/yaml',sh:'text/x-sh'};
-const LANG_EXT={javascript:'js',js:'js',jsx:'jsx',typescript:'ts',ts:'ts',tsx:'tsx',python:'py',py:'py',html:'html',css:'css',json:'json',markdown:'md',md:'md',bash:'sh',shell:'sh',sh:'sh',zsh:'sh',csv:'csv',xml:'xml',svg:'svg',yaml:'yml',yml:'yml',sql:'sql',java:'java',c:'c',cpp:'cpp','c++':'cpp',csharp:'cs',cs:'cs',go:'go',rust:'rs',rs:'rs',php:'php',ruby:'rb',rb:'rb',kotlin:'kt',swift:'swift',lua:'lua',text:'txt',txt:'txt',plaintext:'txt',toml:'toml',ini:'ini',diff:'diff'};
+const MIME={html:'text/html',htm:'text/html',css:'text/css',js:'text/javascript',mjs:'text/javascript',json:'application/json',md:'text/markdown',txt:'text/plain',csv:'text/csv',xml:'application/xml',svg:'image/svg+xml',py:'text/x-python',ts:'text/typescript',yml:'text/yaml',yaml:'text/yaml',sh:'text/x-sh',ics:'text/calendar',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',ico:'image/x-icon',pdf:'application/pdf',zip:'application/zip',mp3:'audio/mpeg',wav:'audio/wav',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'};
+const LANG_EXT={javascript:'js',js:'js',jsx:'jsx',typescript:'ts',ts:'ts',tsx:'tsx',python:'py',py:'py',html:'html',css:'css',json:'json',markdown:'md',md:'md',bash:'sh',shell:'sh',sh:'sh',zsh:'sh',csv:'csv',xml:'xml',svg:'svg',yaml:'yml',yml:'yml',sql:'sql',java:'java',c:'c',cpp:'cpp','c++':'cpp',csharp:'cs',cs:'cs',go:'go',rust:'rs',rs:'rs',php:'php',ruby:'rb',rb:'rb',kotlin:'kt',swift:'swift',lua:'lua',text:'txt',txt:'txt',plaintext:'txt',toml:'toml',ini:'ini',diff:'diff',zip:'zip',docx:'docx',xlsx:'xlsx',pdf:'pdf',png:'png',jpg:'jpg',jpeg:'jpg',gif:'gif',webp:'webp',ics:'ics'};
+const ZIP_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M10 8h2M10 11h2M10 14h2"/></svg>';
 const extOf=n=>(n.split('.').pop()||'').toLowerCase();
+const cleanPath=p=>String(p).replace(/\\/g,'/').split('/').filter(s=>s&&s!=='.'&&s!=='..').map(s=>s.replace(/[^\w.\- ]/g,'_').slice(0,60)).join('/').slice(0,120);
 function parseFence(info,code,n){
   info=(info||'').trim();let lang='',name='';
   const m=info.match(/(?:file(?:name)?|title|name|path)\s*[:=]\s*"?([^\s"]+)"?/i);
   if(m)name=m[1];
+  const b64=/\b(?:encoding|enc)\s*[:=]\s*"?base64"?/i.test(info)||/(^|\s)base64(\s|$)/i.test(info);
   const first=info.split(/\s+/)[0]||'';
   if(first&&!/[:=]/.test(first)){
     if(/^[\w.\-\/]+\.\w{1,8}$/.test(first)&&!LANG_EXT[first.toLowerCase()]){name=name||first;lang=extOf(first)}
     else lang=first.toLowerCase();
   }
-  if(!name){const c=code.slice(0,200).split('\n',1)[0].match(/^\s*(?:\/\/|#|<!--|\/\*|--)\s*file(?:name)?\s*[:=]\s*([\w.\/\-]+\.\w{1,8})/i);if(c)name=c[1]}
-  name=name.replace(/^.*[\\\/]/,'').replace(/[^\w.\- ]/g,'_').slice(0,80);
-  if(!name)name='snippet-'+n+'.'+(LANG_EXT[lang]||'txt');
-  return{lang,name};
+  if(!name){const c=code.slice(0,200).split('\n',1)[0].match(/^\s*(?:\/\/|#|<\x21--|\/\*|--)\s*file(?:name)?\s*[:=]\s*([\w.\/\-]+\.\w{1,8})/i);if(c)name=c[1]}
+  let path=cleanPath(name);
+  if(!path)path=(lang==='zip'?'archive-':'snippet-')+n+'.'+(LANG_EXT[lang]||'txt');
+  let base=path.split('/').pop(),ext=extOf(base),kind='text';
+  if(lang==='zip'||ext==='zip'){kind='zip';if(ext!=='zip'){path+='.zip';base+='.zip'}}
+  else if(b64)kind='bin';
+  else if(ext==='docx'||ext==='xlsx'||ext==='pdf')kind=ext;
+  return{lang,name:base,path,kind};
 }
 const fmtSize=b=>b<1024?b+' B':(b/1024).toFixed(b<10240?1:0)+' KB';
-function codeCard(f,code,key,id){
-  const sz=fmtSize(new Blob([code]).size);
-  return `<div class="fc"><div class="fc-h"><span class="fc-i">${FILE_SVG}</span><span class="fc-n">${esc(f.name)}</span><span class="fc-s">${sz}</span><span class="fc-b"><button data-a="copy" data-k="${key}" data-i="${id}">Copy</button><button data-a="dl" data-k="${key}" data-i="${id}">Download</button></span></div><pre><code>${esc(code)}</code></pre></div>`;
+function zipEntries(z,files){
+  const items=files.filter(x=>x.kind!=='zip');
+  if(!z.list||!z.list.length)return items;
+  return items.filter(x=>z.list.some(p=>p===x.path||p===x.name||x.path.endsWith('/'+p)));
+}
+function codeCard(f,files,key){
+  const bt=(a,l)=>`<button data-a="${a}" data-k="${key}" data-i="${f.id}">${l}</button>`,ext=extOf(f.name);
+  let size='',btns='',body='',icon=FILE_SVG;
+  if(f.kind==='zip'){
+    const inc=zipEntries(f,files);icon=ZIP_SVG;
+    size=inc.length+(inc.length===1?' file':' files');btns=bt('dl','Download .zip');
+    body=`<div class="fc-list">${inc.length?inc.map(x=>`<span>${esc(x.path)}</span>`).join(''):'<em>No files in this reply</em>'}</div>`;
+  }else if(f.kind==='bin'){
+    const b64=f.text.replace(/\s/g,''),mt=MIME[ext]||'';
+    size=fmtSize(Math.floor(b64.length*3/4));btns=bt('dl','Download');
+    body=(/^[A-Za-z0-9+\/]*={0,2}$/.test(b64)&&/^image\//.test(mt))?`<div class="fc-prev"><img alt="" src="data:${mt};base64,${b64}"></div>`:`<div class="fc-note">Binary file${ext?' (.'+esc(ext)+')':''}</div>`;
+  }else{
+    size=fmtSize(new Blob([f.text]).size);
+    if(f.kind==='docx')btns=bt('copy','Copy')+bt('dl','Download .docx');
+    else if(f.kind==='xlsx')btns=bt('copy','Copy')+bt('dl','Download .xlsx');
+    else if(f.kind==='pdf')btns=bt('copy','Copy')+bt('dl','Save as PDF');
+    else btns=bt('copy','Copy')+(ext==='svg'?bt('png','PNG'):'')+((ext==='html'||ext==='htm')?bt('preview','Preview'):'')+bt('dl','Download');
+    if(ext==='svg'&&f.kind==='text')body=`<div class="fc-prev"><img alt="" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(f.text)}"></div>`;
+    body+=`<pre><code>${esc(f.text)}</code></pre>`;
+  }
+  return `<div class="fc"><div class="fc-h"><span class="fc-i">${icon}</span><span class="fc-n">${esc(f.name)}</span><span class="fc-s">${size}</span><span class="fc-b">${btns}</span></div>${body}</div>`;
 }
 function inline(s){
   return s.replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>')
@@ -668,20 +907,26 @@ function inline(s){
 }
 /* handles half-streamed text: an unclosed fence is shown as a plain growing block */
 function md(t,key){
-  t=String(t);const files=[];let out='',i=0,n=0;
+  t=String(t);const segs=[],files=[];let i=0,n=0;
   while(i<t.length){
     const s=t.indexOf('```',i);
-    if(s<0){out+=inline(esc(n?t.slice(i).replace(/^\n+/,''):t.slice(i)));break}
-    const seg=t.slice(i,s).replace(/\n+$/,'');
-    out+=inline(esc(n?seg.replace(/^\n+/,''):seg));
+    if(s<0){segs.push({t:t.slice(i)});break}
+    segs.push({t:t.slice(i,s)});
     const nl=t.indexOf('\n',s+3);
     if(nl<0)break;
     const info=t.slice(s+3,nl),e=t.indexOf('```',nl+1);
-    if(e<0){out+=`<pre class="open"><code>${esc(t.slice(nl+1))}</code></pre>`;break}
+    if(e<0){segs.push({open:t.slice(nl+1)});break}
     const code=t.slice(nl+1,e).replace(/\n$/,'');
-    n++;const f=parseFence(info,code,n);
-    out+=codeCard(f,code,key,files.length);files.push({name:f.name,text:code});
+    n++;const f=parseFence(info,code,n);f.text=code;f.id=files.length;
+    if(f.kind==='zip')f.list=code.split('\n').map(x=>x.replace(/^[\s\-*•]+/,'').replace(/["'`,]/g,'').trim()).filter(Boolean).map(cleanPath);
+    files.push(f);segs.push({f});
     i=e+3;while(t[i]==='\n')i++;
+  }
+  let out='',afterCard=false;
+  for(const s of segs){
+    if(s.f){out+=codeCard(s.f,files,key);afterCard=true}
+    else if(s.open!==undefined)out+=`<pre class="open"><code>${esc(s.open)}</code></pre>`;
+    else{let x=s.t.replace(/\n+$/,'');if(afterCard)x=x.replace(/^\n+/,'');if(x)out+=inline(esc(x));afterCard=false}
   }
   if(key!==undefined)FILES.set(key,files);
   return out;
@@ -696,16 +941,18 @@ function copyText(t){
   const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();toast(ok?'Copied':'Copy failed')};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>toast('Copied'),fb);else fb();
 }
+function b64ToBytes(s){try{const bin=atob(s.replace(/\s/g,'')),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u}catch(e){return new Uint8Array(0)}}
 const CRCT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
 function crc32(u){let c=-1;for(let i=0;i<u.length;i++)c=CRCT[(c^u[i])&255]^(c>>>8);return(c^-1)>>>0}
-function makeZip(files){ /* store-only ZIP, no libraries */
+/* store-only ZIP, no libraries. entries: {path, text | bytes} */
+function makeZip(files,mime){
   const enc=new TextEncoder(),parts=[],cen=[],used=new Set();let off=0;
   const d=new Date(),tm=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1),dt=((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();
   files.forEach(f=>{
-    let name=f.name;
-    if(used.has(name)){const m=name.match(/^(.*?)(\.[^.]*)?$/);let i=2;while(used.has(m[1]+'-'+i+(m[2]||'')))i++;name=m[1]+'-'+i+(m[2]||'')}
+    let name=f.path||f.name;
+    if(used.has(name)){const m=name.match(/^(.*?)(\.[^.\/]*)?$/);let i=2;while(used.has(m[1]+'-'+i+(m[2]||'')))i++;name=m[1]+'-'+i+(m[2]||'')}
     used.add(name);
-    const nb=enc.encode(name),data=enc.encode(f.text),crc=crc32(data);
+    const nb=enc.encode(name),data=f.bytes||enc.encode(f.text||''),crc=crc32(data);
     const lh=new DataView(new ArrayBuffer(30));
     lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(10,tm,true);lh.setUint16(12,dt,true);
     lh.setUint32(14,crc,true);lh.setUint32(18,data.length,true);lh.setUint32(22,data.length,true);lh.setUint16(26,nb.length,true);
@@ -717,32 +964,176 @@ function makeZip(files){ /* store-only ZIP, no libraries */
   });
   const cs=cen.reduce((a,b)=>a+b.byteLength,0),end=new DataView(new ArrayBuffer(22));
   end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);end.setUint32(12,cs,true);end.setUint32(16,off,true);
-  return new Blob([...parts,...cen,end.buffer],{type:'application/zip'});
+  return new Blob([...parts,...cen,end.buffer],{type:mime||'application/zip'});
 }
-$('msgwrap').addEventListener('click',e=>{
+
+/* ---------- Word (.docx) from Markdown ---------- */
+const XML_H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+const xesc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');
+function docxRuns(s){
+  let out='';
+  s.split(/(\*\*[^*]+\*\*)/).forEach(p=>{if(!p)return;const b=/^\*\*[^*]+\*\*$/.test(p);out+=`<w:r>${b?'<w:rPr><w:b/></w:rPr>':''}<w:t xml:space="preserve">${xesc(b?p.slice(2,-2):p)}</w:t></w:r>`});
+  return out;
+}
+function docxPara(line){
+  let m;
+  if((m=line.match(/^(#{1,3})\s+(.*)$/)))return `<w:p><w:pPr><w:pStyle w:val="Heading${m[1].length}"/></w:pPr>${docxRuns(m[2])}</w:p>`;
+  if((m=line.match(/^\s*[-*•]\s+(.*)$/)))return `<w:p><w:pPr><w:ind w:left="540" w:hanging="270"/></w:pPr>${docxRuns('• '+m[1])}</w:p>`;
+  if((m=line.match(/^\s*(\d+)[.)]\s+(.*)$/)))return `<w:p><w:pPr><w:ind w:left="540" w:hanging="360"/></w:pPr>${docxRuns(m[1]+'. '+m[2])}</w:p>`;
+  if(!line.trim())return '<w:p/>';
+  return `<w:p>${docxRuns(line)}</w:p>`;
+}
+function toDocx(text){
+  const W='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+  const body=String(text).replace(/\r/g,'').split('\n').map(docxPara).join('');
+  const styles=[1,2,3].map(n=>`<w:style w:type="paragraph" w:styleId="Heading${n}"><w:name w:val="heading ${n}"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="${360-n*60}" w:after="120"/></w:pPr><w:rPr><w:b/><w:sz w:val="${[40,32,26][n-1]}"/></w:rPr></w:style>`).join('');
+  return makeZip([
+    {path:'[Content_Types].xml',text:XML_H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>'},
+    {path:'_rels/.rels',text:XML_H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'},
+    {path:'word/_rels/document.xml.rels',text:XML_H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+    {path:'word/styles.xml',text:XML_H+`<w:styles ${W}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/><w:sz w:val="22"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="276" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>${styles}</w:styles>`},
+    {path:'word/document.xml',text:XML_H+`<w:document ${W}><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`}
+  ],MIME.docx);
+}
+
+/* ---------- Excel (.xlsx) from CSV ---------- */
+function parseCsv(t){
+  t=String(t).replace(/\r/g,'');
+  const first=t.split('\n',1)[0],d=((first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length)?';':',';
+  const rows=[];let r=[],f='',q=false;
+  for(let i=0;i<t.length;i++){
+    const c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===d){r.push(f);f=''}
+    else if(c==='\n'){r.push(f);rows.push(r);r=[];f=''}
+    else f+=c;
+  }
+  if(f!==''||r.length){r.push(f);rows.push(r)}
+  return rows;
+}
+function colName(i){let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s}
+function toXlsx(csv){
+  const sheet=parseCsv(csv).map((r,ri)=>`<row r="${ri+1}">`+r.map((v,ci)=>{
+    const ref=colName(ci)+(ri+1),s=v.trim();
+    if(s!==''&&/^-?(0|[1-9]\d*)(\.\d+)?$/.test(s))return `<c r="${ref}"><v>${s}</v></c>`;
+    return v===''?'':`<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xesc(v)}</t></is></c>`;
+  }).join('')+'</row>').join('');
+  const NS='http://schemas.openxmlformats.org/spreadsheetml/2006/main',R='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  return makeZip([
+    {path:'[Content_Types].xml',text:XML_H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'},
+    {path:'_rels/.rels',text:XML_H+`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${R}/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
+    {path:'xl/workbook.xml',text:XML_H+`<workbook xmlns="${NS}" xmlns:r="${R}"><sheets><sheet name="Sheet1" sheetId="1" r:id="rId1"/></sheets></workbook>`},
+    {path:'xl/_rels/workbook.xml.rels',text:XML_H+`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${R}/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`},
+    {path:'xl/worksheets/sheet1.xml',text:XML_H+`<worksheet xmlns="${NS}"><sheetData>${sheet}</sheetData></worksheet>`}
+  ],MIME.xlsx);
+}
+
+/* ---------- PDF (via the browser's print dialog), PNG from SVG ---------- */
+const inline2=s=>inline(esc(s));
+function mdHtml(t){
+  let h='',list=false;
+  String(t).replace(/\r/g,'').split('\n').forEach(l=>{
+    const li=l.match(/^\s*[-*•]\s+(.*)$/);
+    if(li&&!list){h+='<ul>';list=true}
+    if(!li&&list){h+='</ul>';list=false}
+    let m;
+    if(li)h+='<li>'+inline2(li[1])+'</li>';
+    else if((m=l.match(/^(#{1,3})\s+(.*)$/)))h+=`<h${m[1].length}>${inline2(m[2])}</h${m[1].length}>`;
+    else if(l.trim())h+='<p>'+inline2(l)+'</p>';
+  });
+  return h+(list?'</ul>':'');
+}
+function pdfHtml(text,name){
+  return /^\s*<(!doctype|html|body|h1|div|p|table)\b/i.test(text)?text:
+    '<!doctype html><meta charset="utf-8"><title>'+esc(name)+'</title><style>body{font:14px/1.6 system-ui,sans-serif;max-width:720px;margin:24px auto;padding:0 20px;color:#222}h1,h2,h3{margin:1.2em 0 .4em}code{font-family:ui-monospace,monospace;background:#f1f1ef;padding:1px 4px;border-radius:4px}ul{padding-left:22px}</style><body>'+mdHtml(text)+'</body>';
+}
+function printPdf(text,name){
+  const fr=document.createElement('iframe');fr.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  fr.srcdoc=pdfHtml(text,name);
+  fr.onload=()=>setTimeout(()=>{try{fr.contentWindow.focus();fr.contentWindow.print()}catch(e){toast('Printing is blocked in this browser')}setTimeout(()=>fr.remove(),60000)},250);
+  document.body.appendChild(fr);toast('Choose "Save as PDF" in the print dialog');
+}
+function svgToPng(svg,name){
+  const img=new Image();
+  img.onload=()=>{
+    const w=img.naturalWidth||512,h=img.naturalHeight||512,sc=Math.min(4,2048/Math.max(w,h)),c=document.createElement('canvas');
+    c.width=Math.round(w*sc);c.height=Math.round(h*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    c.toBlob(b=>b?saveBlob(b,name.replace(/\.svg$/i,'')+'.png'):toast('Could not render the image'),'image/png');
+  };
+  img.onerror=()=>toast('Could not render the SVG');
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+
+/* ---------- bundle + dispatch ---------- */
+async function bundle(entries){
+  const enc=new TextEncoder(),out=[];
+  for(const x of entries){
+    if(x.kind==='bin')out.push({path:x.path,bytes:b64ToBytes(x.text)});
+    else if(x.kind==='docx')out.push({path:x.path,bytes:new Uint8Array(await toDocx(x.text).arrayBuffer())});
+    else if(x.kind==='xlsx')out.push({path:x.path,bytes:new Uint8Array(await toXlsx(x.text).arrayBuffer())});
+    else if(x.kind==='pdf')out.push({path:x.path.replace(/\.pdf$/i,'')+'.html',bytes:enc.encode(pdfHtml(x.text,x.name))});
+    else out.push({path:x.path,bytes:enc.encode(x.text)});
+  }
+  return out;
+}
+async function downloadFile(f,files){
+  const ext=extOf(f.name);
+  if(f.kind==='zip'){const ents=await bundle(zipEntries(f,files));if(!ents.length){toast('There are no files to put in the zip');return}saveBlob(makeZip(ents),f.name);return}
+  if(f.kind==='bin'){saveBlob(new Blob([b64ToBytes(f.text)],{type:MIME[ext]||'application/octet-stream'}),f.name);return}
+  if(f.kind==='docx'){saveBlob(toDocx(f.text),f.name);return}
+  if(f.kind==='xlsx'){saveBlob(toXlsx(f.text),f.name);return}
+  if(f.kind==='pdf'){printPdf(f.text,f.name);return}
+  saveBlob(new Blob([f.text],{type:(MIME[ext]||'text/plain')+';charset=utf-8'}),f.name);
+}
+$('msgwrap').addEventListener('click',async e=>{
   const b=e.target.closest('button[data-a]');if(!b)return;
   const a=b.dataset.a,k=b.dataset.k,files=FILES.get(k)||[],f=files[+b.dataset.i];
   if(a==='copy'&&f)copyText(f.text);
-  else if(a==='dl'&&f)saveBlob(new Blob([f.text],{type:(MIME[extOf(f.name)]||'text/plain')+';charset=utf-8'}),f.name);
-  else if(a==='zip'&&files.length)saveBlob(makeZip(files),'solution-ai-files.zip');
+  else if(a==='dl'&&f)downloadFile(f,files);
+  else if(a==='png'&&f)svgToPng(f.text,f.name);
+  else if(a==='preview'&&f)openPreview(f,files);
+  else if(a==='zip'){const ents=await bundle(files.filter(x=>x.kind!=='zip'));if(ents.length)saveBlob(makeZip(ents),'solution-ai-files.zip')}
+  else if(a==='prevall'){const hs=files.filter(x=>x.kind==='text'&&/\.html?$/i.test(x.name));const h=hs.find(x=>/(^|\/)index\.html?$/i.test(x.name))||hs[0];if(h)openPreview(h,files)}
+  else if(a==='good'||a==='bad'){const r=RECIPES.get(k);if(r){learnRecipe(r,a==='good'?1:-1);RECIPES.delete(k);const p=e.target.parentNode;p.querySelectorAll('[data-a=good],[data-a=bad]').forEach(x=>x.remove());toast(a==='good'?'Thanks! Solution learned this recipe':'Noted. I will avoid it next time')}}
   else if(a==='copymsg')copyText(TEXTS.get(k)||'');
   else if(a==='mddl')saveBlob(new Blob([TEXTS.get(k)||''],{type:'text/markdown;charset=utf-8'}),'solution-reply-'+new Date().toISOString().slice(0,16).replace(/[-:T]/g,'')+'.md');
 });
+
+/* ---------- live preview of generated sites ---------- */
+function previewDoc(f,files){
+  const base=n=>cleanPath(n).split('/').pop().toLowerCase(),get=u=>{const b=base(u.split(/[?#]/)[0]);return files.find(x=>x.kind==='text'&&base(x.name)===b)};
+  let h=f.text;
+  h=h.replace(/<link\b[^>]*href=["']([^"']+)["'][^>]*>/gi,(m,u)=>{const x=/stylesheet/i.test(m)&&get(u);return x?'<style>'+x.text+'</style>':m});
+  h=h.replace(/<scri[p]t\b([^>]*)src=["']([^"']+)["']([^>]*)>\s*<\/scri[p]t>/gi,(m,a,u)=>{const x=get(u);return x?'<scr'+'ipt>'+x.text.replace(/<\/scri[p]t/gi,'<\\/scr'+'ipt')+'<'+'/script>':m});
+  const shim='<scr'+'ipt>try{localStorage.getItem(\"x\")}catch(e){var m={};Object.defineProperty(window,\"localStorage\",{value:{getItem:function(k){return k in m?m[k]:null},setItem:function(k,v){m[k]=String(v)},removeItem:function(k){delete m[k]},clear:function(){m={}}}})}<'+'/script>';
+  return shim+h;
+}
+function openPreview(f,files){
+  closePreview();
+  const o=document.createElement('div');o.id='pv';o.className='pv';
+  o.innerHTML='<div class="pv-box"><div class="pv-h"><b>Preview</b><span>'+esc(f.name)+'</span><span class="grow"></span><button data-pv="tab">Open in new tab</button><button data-pv="x">Close</button></div><iframe sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe></div>';
+  document.body.appendChild(o);
+  const doc=previewDoc(f,files);o.querySelector('iframe').srcdoc=doc;
+  o.onclick=e=>{const t=e.target;if(t===o||t.dataset.pv==='x')closePreview();else if(t.dataset.pv==='tab')window.open(URL.createObjectURL(new Blob([doc],{type:'text/html'})),'_blank')};
+}
+function closePreview(){const o=document.getElementById('pv');if(o)o.remove()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePreview()});
 
 /* ---------- messages ---------- */
 function buildMsg(role,text,av,name,err){
   const d=document.createElement('div');d.className='msg '+role;
   if(role==='user'){d.innerHTML='<div class="body"></div>';d.querySelector('.body').textContent=text;return d}
   const k='m'+(++MID);d.dataset.k=k;const a=av||[AUTO.color,'auto'];
-  d.innerHTML=`${avRaw(a[0],a[1],'lg')}<div class="col"><div class="who">${esc(name||'Auto')}</div><div class="body ${err?'err':''}"></div><div class="acts"></div></div>`;
+  d.innerHTML=`${avRaw(a[0],a[1],'lg',a[2])}<div class="col"><div class="who">${esc(name||'Auto')}</div><div class="body ${err?'err':''}"></div><div class="acts"></div></div>`;
   d.querySelector('.body').innerHTML=md(text,k);
   if(text&&!err)addActs(d,text);
   return d;
 }
 function addActs(d,text){
   const a=d.querySelector('.acts'),k=d.dataset.k;if(!a||!text)return;
-  TEXTS.set(k,text);const n=(FILES.get(k)||[]).length;
-  a.innerHTML=`<button data-a="copymsg" data-k="${k}">Copy</button><button data-a="mddl" data-k="${k}">Download .md</button>`+(n>1?`<button data-a="zip" data-k="${k}">Download all ${n} files (.zip)</button>`:'');
+  TEXTS.set(k,text);const n=(FILES.get(k)||[]).filter(x=>x.kind!=='zip').length;
+  a.innerHTML=`<button data-a="copymsg" data-k="${k}">Copy</button><button data-a="mddl" data-k="${k}">Download .md</button>`+(((FILES.get(k)||[]).some(x=>x.kind==='text'&&/\.html?$/i.test(x.name)))?`<button data-a="prevall" data-k="${k}">Preview site</button>`:'')+(RECIPES.has(k)?`<button data-a="good" data-k="${k}">👍 Good</button><button data-a="bad" data-k="${k}">👎 Not good</button>`:'')+(n>1?`<button data-a="zip" data-k="${k}">Download all ${n} files (.zip)</button>`:'');
 }
 function addMsg(role,text,av,name,err){
   const d=buildMsg(role,text,av,name,err);$('msgwrap').appendChild(d);$('messages').scrollTop=$('messages').scrollHeight;return d;
@@ -757,12 +1148,8 @@ function renderMsgs(){
 }
 function pickAuto(text){
   const api=autoApi();
-  if(api.length){const m=api[Math.floor(Math.random()*api.length)];return{kind:'api',m,name:m.name,av:[API_TYPES[m.type].color,'key']}}
-  const avail=builtinAvail();const hard=text.length>120||/code|bug|prove|analy|plan/i.test(text);
-  const top=Math.max(...avail.map(a=>a.m.plan));
-  let pool=avail.filter(x=>hard?x.m.plan===top:x.m.plan===1);if(!pool.length)pool=avail;
-  const x=pool[Math.floor(Math.random()*pool.length)];
-  return{kind:'demo',name:x.m.n,av:[x.p.color,x.p.icon]};
+  if(api.length){const m=api[Math.floor(Math.random()*api.length)];return{kind:'api',m,name:m.name,av:apiIc(m)}}
+  return solTarget(); /* no API models: Auto answers with Solution (engine or offline Brain) */
 }
 
 /* ---------- API (streaming) ---------- */
@@ -817,7 +1204,48 @@ async function callApi(m,history,system,opt){
   return data.choices?.[0]?.message?.content||'(empty response)';
 }
 function trimHist(h){h=h.slice(-20);while(h.length&&h[0].role!=='user')h.shift();return h}
-function setBusy(b){$('send').innerHTML=b?STOP_SVG:SEND_SVG;$('send').title=b?'Stop':'Send';updateSend()}
+const PH=['Thinking…','Reading your request…','Checking the Brain…','Connecting the dots…','Putting it together…','Almost there…'];let TT=0;
+function setBusy(b){document.body.classList.toggle('busy',b);clearInterval(TT);if(b){let i=0;TT=setInterval(()=>{const e=document.querySelector('.typing .tt');if(e)e.textContent=PH[++i%PH.length]},2400)}$('send').innerHTML=b?STOP_SVG:SEND_SVG;$('send').title=b?'Stop':'Send';updateSend()}
+
+/* ---------- big projects: plan, then write file by file (no templates) ---------- */
+const BUILD_VERB=/(make|create|build|generate|develop|code|write|implement|сделай|создай|напиши|разработай|сгенерируй|запили)/i;
+const BUILD_NOUN=/(website|web ?site|web ?app|application|app\b|game|platform|dashboard|backend|frontend|full[- ]?stack|clone|store|shop|bot\b|api\b|project|system|crm|сайт|приложени|игр|проект|платформ|магазин|бот\b|бэкенд|фронтенд|систем)/i;
+const isBigBuild=(text,t)=>BUILD_VERB.test(text)&&BUILD_NOUN.test(text)&&(t.solution||/project|проект/i.test(text));
+function jsonOf(s){const a=s.indexOf('{'),b=s.lastIndexOf('}');if(a<0||b<a)throw new Error('The model did not return a plan');return JSON.parse(s.slice(a,b+1))}
+function stripFence(s){const m=s.match(/^\s*`{3,}[^\n]*\n([\s\S]*?)\n?`{3,}\s*$/);if(m)return m[1];const m2=s.match(/`{3,}[^\n]*\n([\s\S]*?)\n`{3,}/);return m2?m2[1]:s.replace(/^\s+|\s+$/g,'')}
+const safeFence=(lang,path,code)=>'```'+lang+' file:'+path+'\n'+code.replace(/```/g,'~~~').replace(/\n+$/,'')+'\n```';
+async function buildProject(m,text,history,sys,signal,onProgress){
+  const ask=(system,user)=>callApi(m,[{role:'user',content:user}],system,{signal});
+  const ctxHist=history.slice(-6,-1).map(h=>h.role+': '+h.content.slice(0,1500)).join('\n');
+  onProgress('Planning the project…',[]);
+  const planSys=sys+'\n\nYou are a senior software architect. Plan a complete, working project for the request. Reply with ONLY JSON, no prose: {"name":"kebab-case-name","summary":"2-4 sentences: what it is and how to run it","stack":"short","files":[{"path":"relative/path.ext","purpose":"what this file contains: responsibilities, exported names, function signatures, data shapes and which other files it uses"}]}. Rules: 6 to 24 files, include README.md with run steps, include dependency files (package.json, requirements.txt) when needed, no binary files, every file named in the plan must be self-consistent with the others (same function names, ids, routes, class names).';
+  let plan;
+  for(let i=0;i<2;i++){try{plan=jsonOf(await ask(planSys,(ctxHist?'Conversation so far:\n'+ctxHist+'\n\n':'')+'Request: '+text));if(plan.files&&plan.files.length)break}catch(e){if(e.name==='AbortError'||i)throw e}}
+  const files=(plan.files||[]).filter(f=>f&&f.path&&typeof f.path==='string').slice(0,24).map(f=>({path:cleanPath(f.path),purpose:String(f.purpose||'')}));
+  if(!files.length)throw new Error('The model returned an empty plan');
+  const name=(String(plan.name||'project').toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'')||'project');
+  const done=[],failed=[];
+  const planTxt=files.map(f=>'- '+f.path+': '+f.purpose).join('\n');
+  for(let i=0;i<files.length;i++){
+    const f=files[i];
+    onProgress('Writing files ('+(i+1)+'/'+files.length+')',files.map((x,k)=>({p:x.path,s:k<i?'done':k===i?'now':'wait'})));
+    const prev=done.map(d=>'### '+d.path+'\n'+d.code.slice(0,1800)).join('\n\n');
+    const fsys=sys+'\n\nYou are writing one file of a larger project. Project: '+name+'. '+String(plan.summary||'')+'\nStack: '+String(plan.stack||'')+'\nFull file plan:\n'+planTxt+'\n\nAlready written files (may be shortened):\n'+(prev||'(none yet)')+'\n\nWrite the COMPLETE, working content of exactly one file: '+f.path+'. Purpose: '+f.purpose+'\nUse the exact names, ids, routes and imports defined in the plan and the written files. No placeholders, no TODOs, no "rest of the code". Output only the file inside one fenced code block, no explanation.';
+    let code='',ok=false;
+    for(let a=0;a<2&&!ok;a++){
+      try{code=stripFence(await ask(fsys,'Original request: '+text+'\n\nNow write '+f.path));ok=code.trim().length>0}catch(e){if(e.name==='AbortError')throw e}
+    }
+    if(!ok){failed.push(f.path);code='/* Solution.AI could not generate this file. Ask: write '+f.path+' */'}
+    done.push({path:f.path,code});
+  }
+  onProgress('Done',[]);
+  const root=name+'/';
+  const body=done.map(d=>safeFence(LANG_EXT_OF(d.path),root+d.path,d.code)).join('\n\n');
+  const how=failed.length?'\n\nThese files failed and need a retry: '+failed.map(x=>'`'+x+'`').join(', ')+'. Ask me to rewrite them.':'';
+  return '**'+name+'**\n\n'+String(plan.summary||'')+'\n\n'+body+'\n\n```zip file:'+name+'.zip\n```'+how+'\n\nWant changes or new features? Describe them and I will update the files.';
+}
+function LANG_EXT_OF(p){const e=(p.split('.').pop()||'').toLowerCase();return({js:'js',mjs:'js',ts:'ts',tsx:'tsx',jsx:'jsx',py:'python',html:'html',css:'css',json:'json',md:'markdown',sh:'bash',yml:'yaml',yaml:'yaml',sql:'sql',java:'java',go:'go',rs:'rust',php:'php',c:'c',cpp:'cpp',cs:'csharp',txt:'text'})[e]||'text'}
+const progressMd=(title,list)=>'**'+title+'**\n\n'+list.map(x=>(x.s==='done'?'✓ ':x.s==='now'?'→ ':'· ')+'`'+x.p+'`').join('\n');
 
 async function send(){
   if(ctl)return;
@@ -830,9 +1258,10 @@ async function send(){
   S.cur.msgs.push({role:'user',text});addMsg('user',text);
   let t;
   if(S.sel.provider==='auto')t=pickAuto(text);
-  else if(S.sel.provider==='api'){const m=S.api.find(x=>x.id===S.sel.model);t={kind:'api',m,name:m.name,av:[API_TYPES[m.type].color,'key']}}
-  else{const p=curProvider();t={kind:'demo',name:S.sel.model,av:[p.color,p.icon]}}
-  const label=S.sel.provider==='auto'?'Auto → '+t.name:t.name;
+  else if(S.sel.provider==='solution')t=solTarget();
+  else if(S.sel.provider==='api'){const m=S.api.find(x=>x.id===S.sel.model);t={kind:'api',m,name:m.name,av:apiIc(m)}}
+  else{const p=curProvider();t={kind:'demo',name:S.sel.model,av:[p.color,p.icon,p.id]}}
+  const label=S.sel.provider==='auto'?'Auto → '+(t.label||t.name):(t.label||t.name);
   const el=addMsg('ai','',t.av,label),b=el.querySelector('.body'),key=el.dataset.k,box=$('messages');
   b.innerHTML=TYPING;
   ctl=new AbortController();setBusy(true);
@@ -840,8 +1269,11 @@ async function send(){
   const paint=()=>{raf=0;const near=box.scrollHeight-box.scrollTop-box.clientHeight<160;b.innerHTML=md(latest,key);if(near)box.scrollTop=box.scrollHeight};
   try{
     if(t.kind==='api'){
-      const sys=[FILE_RULES,brainSystem(),await repoContext()].filter(Boolean).join('\n\n');
-      reply=await callApi(t.m,trimHist(history),sys,{signal:ctl.signal,onDelta:x=>{latest=x;if(!raf)raf=requestAnimationFrame(paint)}});
+      const sys=[FILE_RULES,t.solution?solSystem(t.m):brainSystem(),await repoContext()].filter(Boolean).join('\n\n');
+      if(isBigBuild(text,t)){reply=await buildProject(t.m,text,history,sys,ctl.signal,(ti,li)=>{latest=progressMd(ti,li);if(!raf)raf=requestAnimationFrame(paint)});latest=''}
+      else reply=await callApi(t.m,trimHist(history),sys,{signal:ctl.signal,onDelta:x=>{latest=x;if(!raf)raf=requestAnimationFrame(paint)}});
+    }else if(t.kind==='solution'){
+      await new Promise(r=>setTimeout(r,250));reply=await solOffline(text,md0=>{latest=md0;if(!raf)raf=requestAnimationFrame(paint)});latest='';if(LAST_RECIPE){RECIPES.set(key,LAST_RECIPE);LAST_RECIPE=null}
     }else{
       await new Promise(r=>setTimeout(r,350));
       const fromBrain=S.brainOn?brainAnswer(text):null;
@@ -873,6 +1305,8 @@ function renderRepoChip(){
 }
 $('repoChip').onclick=()=>{S.repo=null;RC.repo='';LS.set('up_repo',null);renderRepoChip();toast('Repository detached')};
 
+
+$('siteLogo').innerHTML='<span class="lface">S</span>'+thinkHtml(18);
 /* ================= PLANS ================= */
 function renderPlans(){
   $('plans').innerHTML=PLANS.map(p=>{const cur=S.plan===p.rank;
@@ -885,7 +1319,7 @@ function renderPlans(){
 }
 
 /* ================= SETTINGS ================= */
-const TABS=[['general','General'],['brain','Brain'],['api','API Models'],['integrations','Integrations'],['data','Data & privacy']];
+const TABS=[['general','General'],['solution','Solution'],['brain','Brain'],['api','API Models'],['icons','Icons'],['integrations','Integrations'],['data','Data & privacy']];
 let curTab='general',editId=null;
 function openSettings(tab){curTab=tab||curTab;editId=null;$('overlay').classList.add('open');renderSettings()}
 function closeSettings(){if(!$('overlay').classList.contains('open'))return;$('overlay').classList.remove('open');renderBtn();if(!S.cur)renderHero()}
@@ -897,7 +1331,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSettings();clo
 function renderSettings(){
   $('mNav').innerHTML='<h2>Settings</h2>'+TABS.map(t=>`<button class="nav ${t[0]===curTab?'active':''}" data-t="${t[0]}">${t[1]}</button>`).join('');
   $('mNav').querySelectorAll('.nav').forEach(b=>b.onclick=()=>{curTab=b.dataset.t;editId=null;renderSettings()});
-  const body=$('mBody');body.scrollTop=0;({general:tabGeneral,brain:tabBrain,api:tabApi,integrations:tabInteg,data:tabData})[curTab](body);
+  const body=$('mBody');body.scrollTop=0;({general:tabGeneral,solution:tabSolution,brain:tabBrain,api:tabApi,icons:tabIcons,integrations:tabInteg,data:tabData})[curTab](body);
 }
 function tabGeneral(b){
   b.innerHTML=`<h3>General</h3><div class="sub">Personalize Solution.AI.</div>
@@ -926,21 +1360,21 @@ function tabApi(b){
   if(editId!==null)return apiForm(b);
   b.innerHTML=`<h3>API Models</h3><div class="sub">Connect your own API key. The model appears under <b>ApiModels</b> in the model picker and can be included in <b>Auto</b>.</div>
   <div class="note warn">Keys are stored only in this browser (localStorage) and sent directly to the provider you choose, never to Solution.AI servers. Anyone with access to this browser profile can read them. Don't use this on shared computers.</div>
-  ${S.api.length?S.api.map(m=>`<div class="card">${avRaw(API_TYPES[m.type].color,'key','lg')}<div class="grow"><div class="t">${esc(m.name)}</div><div class="d">${esc(m.modelId)} · ${esc(API_TYPES[m.type].label.split(' (')[0])} · key •••• ${esc(m.key.slice(-4))}</div></div>
+  ${S.api.length?S.api.map(m=>`<div class="card">${apiAv(m,'lg')}<div class="grow"><div class="t">${esc(m.name)}</div><div class="d">${esc(m.modelId)} · ${esc(API_TYPES[m.type].label.split(' (')[0])} · key •••• ${esc(m.key.slice(-4))}</div></div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><button class="sw ${m.auto?'on':''}" data-auto="${m.id}" title="Include in Auto"></button><span style="font-size:10.5px;color:var(--muted)">Auto</span></div>
     <button class="btn sm" data-edit="${m.id}">Edit</button><button class="btn sm danger" data-del="${m.id}">Remove</button></div>`).join(''):'<div class="sub" style="border:none;margin:0">No API models yet.</div>'}
-  <div class="actions"><button class="btn primary" id="addApi">+ Add API model</button></div>`;
-  $('addApi').onclick=()=>{editId='new';renderSettings()};
+  <div class="actions"><button class="btn primary" id="addApi">+ Add API model</button></div>${presetHtml(false)}`;
+  $('addApi').onclick=()=>{editId='new';renderSettings()};bindPresets(b);
   b.querySelectorAll('[data-edit]').forEach(x=>x.onclick=()=>{editId=x.dataset.edit;renderSettings()});
   b.querySelectorAll('[data-del]').forEach(x=>x.onclick=()=>{
-    S.api=S.api.filter(m=>m.id!==x.dataset.del);LS.set('up_apimodels',S.api);
+    S.api=S.api.filter(m=>m.id!==x.dataset.del);LS.set('up_apimodels',S.api);if(S.solution.engine===x.dataset.del){S.solution.engine='';LS.set('up_solution',S.solution)}
     if(S.sel.provider==='api'&&S.sel.model===x.dataset.del){S.sel={provider:'auto',model:'Auto'};LS.set('up_sel',S.sel)}
     toast('Model removed');renderSettings();
   });
   b.querySelectorAll('[data-auto]').forEach(x=>x.onclick=()=>{const m=S.api.find(y=>y.id===x.dataset.auto);m.auto=!m.auto;LS.set('up_apimodels',S.api);renderSettings()});
 }
 function apiForm(b){
-  const m=editId==='new'?{type:'openai',name:'',modelId:'',key:'',base:'',auto:true}:S.api.find(x=>x.id===editId);
+  const m=editId==='new'?Object.assign({type:'openai',name:'',modelId:'',key:'',base:'',auto:true},DRAFT||{}):S.api.find(x=>x.id===editId);DRAFT=null;let sol=!!(m._sol||(m.id&&S.solution.engine===m.id));
   b.innerHTML=`<h3>${editId==='new'?'Add API model':'Edit API model'}</h3><div class="sub">Works directly from your browser with your own key.</div>
   <div class="field"><label>Provider type</label><select id="aType">${Object.entries(API_TYPES).map(([k,v])=>`<option value="${k}" ${m.type===k?'selected':''}>${v.label}</option>`).join('')}</select></div>
   <div class="two"><div class="field"><label>Display name</label><input id="aName" value="${esc(m.name)}" placeholder="My GPT"></div>
@@ -948,14 +1382,17 @@ function apiForm(b){
   <div class="field"><label>API key</label><input id="aKey" type="password" value="${esc(m.key)}" placeholder="sk-…" autocomplete="off"></div>
   <div class="field"><label>Base URL (optional)</label><input id="aBase" value="${esc(m.base||'')}" placeholder="${API_TYPES[m.type].base}"></div>
   <div class="card"><div class="grow"><div class="t">Include in Auto</div><div class="d">Auto will route messages to this model</div></div><button class="sw ${m.auto?'on':''}" id="aAuto"></button></div>
+  <div class="card"><div class="grow"><div class="t">Use as Solution engine</div><div class="d">Solution answers with this model plus the Brain</div></div><button class="sw ${sol?'on':''}" id="aSol"></button></div>
   <div class="actions"><button class="btn primary" id="aSave">Save</button><button class="btn" id="aTest">Test connection</button><button class="btn" id="aCancel">Cancel</button></div>`;
   let auto=m.auto;
   $('aAuto').onclick=()=>{auto=!auto;$('aAuto').classList.toggle('on',auto)};
+  $('aSol').onclick=()=>{sol=!sol;$('aSol').classList.toggle('on',sol)};
   $('aType').onchange=()=>{$('aBase').placeholder=API_TYPES[$('aType').value].base};
-  const read=()=>({id:m.id||('m'+Date.now()),type:$('aType').value,name:$('aName').value.trim(),modelId:$('aModel').value.trim(),key:$('aKey').value.trim(),base:$('aBase').value.trim(),auto});
+  const read=()=>({id:m.id||('m'+Date.now()),type:$('aType').value,name:$('aName').value.trim(),modelId:$('aModel').value.trim(),key:$('aKey').value.trim(),base:$('aBase').value.trim(),auto,color:m.color,icon:m.icon,preset:m.preset});
   $('aSave').onclick=()=>{
     const v=read();if(!v.name||!v.modelId||!v.key){toast('Fill name, model ID and API key');return}
     if(editId==='new')S.api.push(v);else S.api=S.api.map(x=>x.id===v.id?v:x);
+    if(sol)S.solution.engine=v.id;else if(S.solution.engine===v.id)S.solution.engine='';LS.set('up_solution',S.solution);
     LS.set('up_apimodels',S.api);editId=null;toast('Saved — see ApiModels in the model picker');renderSettings();
   };
   $('aTest').onclick=async()=>{
@@ -1008,10 +1445,687 @@ function tabData(b){
   <div class="card"><div class="grow"><div class="t">Export data</div><div class="d">Download chats & settings (keys not included)</div></div><button class="btn sm" id="exp">Export</button></div>
   <div class="card"><div class="grow"><div class="t">Reset everything</div><div class="d">Clears all Solution.AI data in this browser</div></div><button class="btn sm danger" id="rst">Reset</button></div>`;
   $('clrChats').onclick=()=>{S.chats=[];S.cur=null;LS.set('up_chats',[]);renderHist();toast('Chats cleared');tabData(b)};
-  $('clrKeys').onclick=()=>{S.api=[];LS.set('up_apimodels',[]);if(S.sel.provider==='api'){S.sel={provider:'auto',model:'Auto'};LS.set('up_sel',S.sel)}toast('Keys removed');tabData(b)};
+  $('clrKeys').onclick=()=>{S.api=[];LS.set('up_apimodels',[]);S.solution.engine='';LS.set('up_solution',S.solution);if(S.sel.provider==='api'){S.sel={provider:'auto',model:'Auto'};LS.set('up_sel',S.sel)}toast('Keys removed');tabData(b)};
   $('exp').onclick=()=>{const blob=new Blob([JSON.stringify({chats:S.chats,name:S.name,plan:S.plan,apiModels:S.api.map(m=>({...m,key:undefined}))},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='solution-ai-export.json';a.click()};
   $('rst').onclick=()=>{if(confirm('Delete all Solution.AI data in this browser?')){Object.keys(localStorage).filter(k=>k.startsWith('up_')).forEach(k=>localStorage.removeItem(k));location.reload()}};
 }
+
+/* ================= SOLUTION MODEL ================= */
+let DRAFT=null,logoTarget=null;
+const solEngine=()=>S.api.find(m=>m.id===S.solution.engine)||null;
+const STYLES={balanced:'',concise:'Style: be extremely concise. Answer in as few words as needed unless the user asks for detail.',deep:'Style: think carefully and step by step before answering, check your work, consider edge cases, and give thorough, well-structured answers.'};
+function solSystem(m){
+  return [brainSystem(true),'You are running as "Solution" on the engine "'+m.name+'" that the user connected. If asked which model powers you, say so honestly.',STYLES[S.solution.style]||''].filter(Boolean).join('\n\n');
+}
+function solTarget(){
+  const m=solEngine(),av=[SOLUTION.color,SOLUTION.icon,'solution'];
+  return m?{kind:'api',m,solution:true,name:'Solution',label:'Solution · '+m.name,av}
+          :{kind:'solution',name:'Solution',label:'Solution · Brain',av};
+}
+function solRow(){
+  const e=solEngine(),sel=S.sel.provider==='solution';
+  return `<div class="mrow" data-sol="1">${avatar(SOLUTION,'lg')}<div class="grow"><div class="t">Solution</div><div class="d">${e?'Brain + '+esc(e.name):'Brain + Wikipedia '}</div></div>${sel?CHECK:'<span class="tag api">Built-in</span>'}</div>`;
+}
+
+/* ---------- offline skills (used when Solution has no engine) ---------- */
+const RU=s=>/[а-яё]/i.test(s);
+const fmtNum=n=>String(+n.toPrecision(12));
+function calcEval(s){ /* safe arithmetic, no eval: + - * / ^ and parentheses */
+  let i=0;const ws=()=>{while(s[i]===' ')i++};
+  const expr=()=>{let v=term();for(;;){ws();const c=s[i];if(c==='+'){i++;v+=term()}else if(c==='-'){i++;v-=term()}else return v}};
+  const term=()=>{let v=unary();for(;;){ws();const c=s[i];if(c==='*'){i++;v*=unary()}else if(c==='/'){i++;v/=unary()}else return v}};
+  const unary=()=>{ws();if(s[i]==='-'){i++;return -unary()}if(s[i]==='+'){i++;return unary()}return pow()};
+  const pow=()=>{const b=atom();ws();if(s[i]==='^'){i++;return Math.pow(b,unary())}return b};
+  const atom=()=>{ws();if(s[i]==='('){i++;const v=expr();ws();if(s[i]!==')')throw 0;i++;return v}const st=i;while(i<s.length&&/[\d.]/.test(s[i]))i++;if(st===i)throw 0;const v=parseFloat(s.slice(st,i));if(isNaN(v))throw 0;return v};
+  const v=expr();ws();if(i<s.length)throw 0;return v;
+}
+function skillCalc(q){
+  const pm=q.match(/(\d+(?:[.,]\d+)?)\s*%\s*(?:of|от)\s*(\d+(?:[.,]\d+)?)/i);
+  if(pm){const a=parseFloat(pm[1].replace(',','.')),b=parseFloat(pm[2].replace(',','.'));return `${pm[1]}% of ${pm[2]} = **${fmtNum(a*b/100)}**`}
+  const m=q.trim().replace(/^(what(?:'s| is)|calculate|calc|compute|solve|сколько будет|посчитай|вычисли)\s*/i,'').replace(/[=?!.\s]+$/,'');
+  if(m.length>120||!/^[\d(][\d\s+\-*\/^().x×÷]*[\d)]$/i.test(m))return null;
+  const e=m.replace(/(\d)\s*[x×]\s*(?=[\d(])/gi,'$1*').replace(/÷/g,'/');
+  if(!/[+\-*\/^]/.test(e.replace(/^\s*-/,'')))return null;
+  try{const v=calcEval(e);return isFinite(v)?`${m} = **${fmtNum(v)}**`:'That is undefined.'}catch(x){return null}
+}
+function skillTime(q){
+  if(/(what(?:'s| is)? the time|what time is it|current time|который час|сколько времени)/i.test(q)||/(today'?s date|what(?:'s| is)? the date|what day is it|какое сегодня число|какой сегодня день|какая сегодня дата)/i.test(q)){
+    const ru=RU(q),d=new Date(),tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return (ru?'Сейчас ':'It is ')+d.toLocaleString(ru?'ru-RU':'en-US',{dateStyle:'full',timeStyle:'short'})+' ('+tz+').';
+  }
+  return null;
+}
+const brainSec=name=>brainSections().find(s=>s.hl===name);
+function skillTalk(q){
+  const t=q.trim().toLowerCase().replace(/[!?.\s]+$/,'');
+  if(/^(hi|hello|hey|yo|hola|привет|здравствуй(те)?|салам|добрый (день|вечер)|доброе утро)$/.test(t))
+    return RU(q)?'Привет! Я Solution. Могу сделать сайт или проект, посчитать, назвать дату и время, ответить по Brain и Wikipedia. С чего начнём?'
+      :'Hi! I am Solution. I can build a site or a project, calculate, tell the date and time, and answer from my Brain and Wikipedia. What shall we start with?';
+  if(/^(who are you|what are you|what(?:'s| is) your name|what is solution(?:\.ai)?|who is solution|кто ты|ты кто|как тебя зовут)$/.test(t)){
+    const s=brainSec('identity');
+    if(s)return '**Identity** (from the Brain)\n\n'+s.b.split('\n').filter(l=>l.startsWith('- ')).slice(0,2).join('\n');
+  }
+  if(/^(help|what can you do|what do you know|что ты умеешь|помощь)$/.test(t)){
+    const skip=['identity','core principles','response style','reasoning method','safety and limits','knowledge freshness','mini faq','file delivery'];
+    const topics=brainSections().filter(s=>!skip.includes(s.hl)).map(s=>s.h).join(', ');
+    return 'I can:\n- build sites and projects (landing page, portfolio, to-do app, calculator, game, Python or Node starter) as downloadable files and a .zip\n- calculate, for example `15% of 240` or `(12+8)*3`\n- tell the date and time\n- answer from my Brain and Wikipedia. Topics: '+topics;
+  }
+  if(/^(thanks|thank you|thx|спасибо)$/.test(t))return RU(q)?'Пожалуйста!':'You are welcome!';
+  return null;
+}
+function snippet(line,toks){
+  if(line.length<=300)return line;
+  const l=line.toLowerCase();let at=-1;
+  for(const t of toks){const k=l.indexOf(t);if(k>=0&&(at<0||k<at))at=k}
+  if(at<0)at=0;
+  const a=Math.max(0,at-100),b=Math.min(line.length,at+200);let s=line.slice(a,b);
+  if(a>0){const c=s.search(/[,.;:]\s/);if(c>=0&&c<60)s=s.slice(c+2);s='… '+s}
+  if(b<line.length){const c=Math.max(s.lastIndexOf(', '),s.lastIndexOf('. '));if(c>80)s=s.slice(0,c);s+=' …'}
+  return s;
+}
+function brainAnswer(q){
+  const toks=[...new Set((q.toLowerCase().match(/[a-z0-9]{3,}/g)||[]).filter(t=>!STOP.has(t)))];
+  if(!toks.length)return null;
+  let best=null,bl='',bs=0,hit=false;
+  for(const s of brainSections()){
+    let hs=0;for(const t of toks)if(s.hl.includes(t))hs+=4;
+    for(const ln of s.b.split('\n')){
+      const l=ln.toLowerCase();let m=0;for(const t of toks)if(l.includes(t))m++;
+      const sc=m*2+hs+(m?1:0);
+      if(sc>bs){bs=sc;best=s;bl=ln;hit=m>0}
+    }
+  }
+  if(!best||bs<4)return null;
+  if(!hit)return `**${best.h}** (from the Brain)\n\n${best.b.split('\n').filter(Boolean).slice(0,4).join('\n')}`;
+  return `**${best.h}** (from the Brain)\n\n${snippet(bl,toks)}`;
+}
+async function wikiAnswer(q){
+  const ru=RU(q),lang=ru?'ru':'en';
+  let t=q.trim().replace(/[?!.]+$/,'');
+  t=t.replace(/^(what is|what are|what's|who is|who was|who are|tell me about|explain|define|что такое|что такое|кто такой|кто такая|кто такие|расскажи про|расскажи о|объясни)\s+(a |an |the )?/i,'').trim();
+  if(t.length<2||t.length>80)return null;
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),6000);
+  try{
+    const base='https://'+lang+'.wikipedia.org/';
+    const r=await fetch(base+'w/api.php?action=query&list=search&format=json&origin=*&srlimit=1&srsearch='+encodeURIComponent(t),{signal:ctl.signal});
+    const j=await r.json(),hit=j.query&&j.query.search&&j.query.search[0];
+    if(!hit)return null;
+    const r2=await fetch(base+'api/rest_v1/page/summary/'+encodeURIComponent(hit.title.replace(/ /g,'_')),{signal:ctl.signal});
+    const d=await r2.json();
+    if(!d.extract)return null;
+    const url=(d.content_urls&&d.content_urls.desktop&&d.content_urls.desktop.page)||base+'wiki/'+encodeURIComponent(hit.title);
+    return '**'+d.title+'** (Wikipedia)\n\n'+d.extract+'\n\n[Read more]('+url+')';
+  }catch(e){return null}finally{clearTimeout(to)}
+}
+async function solOffline(q,prog){
+  const tc=teachCmd(q);if(tc)return tc;
+  const bq=await composeBuild(q,prog);if(bq)return bq;
+  await loadShared();
+  const lf=learnedFact(q);if(lf)return lf.a+'\n\n*'+(RU(q)?'Из того, чему меня научили':'From what I was taught')+'*';
+  const a=skillTalk(q)||skillCalc(q)||skillTime(q)||brainAnswer(q);
+  if(a)return a;
+  const w=await wikiAnswer(q);if(w)return w;
+  return RU(q)?'Я не нашёл этого в Brain и в Wikipedia. Попробуй переформулировать вопрос или попроси меня сделать сайт или проект.'
+    :'I could not find that in my Brain or Wikipedia. Try rephrasing, or ask me to build a site or a project.';
+}
+
+
+/* ---------- offline builder: sites, apps, projects ---------- */
+const FNC='```',SCL='</'+'script>';
+const BASE_CSS=`:root{--bg:#fff;--ink:#1f1f1f;--muted:#6b6b6b;--line:#e7e5e0;--accent:#2563eb}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+a{color:var(--accent);text-decoration:none}.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header.nav{border-bottom:1px solid var(--line);position:sticky;top:0;background:#ffffffee;backdrop-filter:blur(8px)}
+header.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+header.nav nav a{margin-left:18px;color:var(--muted)}header.nav nav a:hover{color:var(--ink)}
+.logo{font-weight:700;font-size:18px;color:var(--ink)}
+.btn{display:inline-block;padding:11px 20px;border-radius:10px;background:var(--accent);color:#fff;border:0;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.hero{padding:96px 0 72px;text-align:center}.hero h1{font-size:clamp(34px,6vw,58px);line-height:1.1;margin:0 0 16px;letter-spacing:-.02em}
+.hero p{color:var(--muted);font-size:19px;max-width:560px;margin:0 auto 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;padding:24px 0 72px}
+.card{border:1px solid var(--line);border-radius:14px;padding:22px;background:#fff}.card h3{margin:0 0 6px}.card p{margin:0;color:var(--muted)}
+section{padding:40px 0}h2{font-size:28px;margin:0 0 14px}
+form{display:grid;gap:10px;max-width:420px}input,textarea{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:10px}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);text-align:center;font-size:14px}
+`;
+const pageShell=(title,body,css,js)=>`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title>
+<link rel="stylesheet" href="${css}">
+</head>
+<body>
+${body}
+<scr\u0069pt src="${js}">${SCL}
+</body>
+</html>
+`;
+function buildKind(t){
+  if(/to-?do|task|список дел|задач/.test(t))return 'todo';
+  if(/calculator|калькулятор/.test(t))return 'calc';
+  if(/tic[- ]?tac|крестики|game|игр/.test(t))return 'game';
+  if(/portfolio|resume|cv|портфолио|резюме/.test(t))return 'portfolio';
+  if(/python|скрипт|script|cli|бот|bot/.test(t)&&!/site|web|сайт/.test(t))return 'py';
+  if(/node|express|api|server|сервер/.test(t)&&!/site|web|сайт/.test(t))return 'node';
+  return 'landing';
+}
+function buildTitle(q,kind){
+  const m=q.match(/["“«']([^"”»']{2,40})["”»']/)||q.match(/(?:called|named|for|about|про|для|под названием|называется)\s+([^,.!?\n]{2,40})/i);
+  let n=m?m[1].trim():'';
+  n=n.replace(/\b(a|an|the|my|me)\b\s*/gi,'').trim();
+  if(!n||/^(site|website|page|project|app|сайт)$/i.test(n))n={todo:'Tasks',calc:'Calculator',game:'Tic-Tac-Toe',portfolio:'My Portfolio',py:'My Script',node:'My API',landing:'My Project'}[kind];
+  return n.charAt(0).toUpperCase()+n.slice(1);
+}
+const fenced=(lang,path,code)=>`${FNC}${lang} file:${path}\n${code.replace(/\n+$/,'')}\n${FNC}`;
+function buildFiles(kind,T,d){
+  const f=[];const nav=`<header class="nav"><div class="wrap"><a class="logo" href="#">${T}</a><nav><a href="#features">Features</a><a href="#contact">Contact</a></nav></div></header>`;
+  const foot=`<footer><div class="wrap">© ${new Date().getFullYear()} ${T}. Made with Solution.AI</div></footer>`;
+  if(kind==='landing'){
+    f.push(['html',d+'/index.html',pageShell(T,`${nav}
+<main>
+<section class="hero"><div class="wrap"><h1>${T}</h1><p>A clean, fast page that says what you do in one sentence.</p><a class="btn" href="#contact">Get started</a> <a class="btn ghost" href="#features">Learn more</a></div></section>
+<section id="features"><div class="wrap"><h2>Features</h2><div class="grid">
+<div class="card"><h3>Fast</h3><p>Plain HTML, CSS and JavaScript. No build step.</p></div>
+<div class="card"><h3>Responsive</h3><p>Looks good on phones, tablets and desktops.</p></div>
+<div class="card"><h3>Easy to edit</h3><p>Change the text in index.html and the colors in css/style.css.</p></div>
+</div></div></section>
+<section id="contact"><div class="wrap"><h2>Contact</h2><form id="form"><input name="name" placeholder="Your name" required><input name="email" type="email" placeholder="Email" required><textarea name="msg" rows="4" placeholder="Message"></textarea><button class="btn">Send</button><p id="ok" hidden>Thanks! We will get back to you.</p></form></div></section>
+</main>
+${foot}`,'css/style.css','js/app.js')]);
+    f.push(['css',d+'/css/style.css',BASE_CSS]);
+    f.push(['js',d+'/js/app.js',`document.getElementById('form').addEventListener('submit',function(e){
+  e.preventDefault();
+  document.getElementById('ok').hidden=false;
+  e.target.reset();
+});`]);
+  }else if(kind==='portfolio'){
+    f.push(['html',d+'/index.html',pageShell(T,`${nav.replace('Features','Work')}
+<main>
+<section class="hero"><div class="wrap"><h1>Hi, I am ${T==='My Portfolio'?'Your Name':T}</h1><p>Designer and developer. I build things for the web.</p><a class="btn" href="#features">See my work</a></div></section>
+<section id="features"><div class="wrap"><h2>Work</h2><div class="grid">
+<div class="card"><h3>Project one</h3><p>Short description of what you made and why.</p></div>
+<div class="card"><h3>Project two</h3><p>Short description of what you made and why.</p></div>
+<div class="card"><h3>Project three</h3><p>Short description of what you made and why.</p></div>
+</div></div></section>
+<section id="contact"><div class="wrap"><h2>Contact</h2><p>Write to <a href="mailto:you@example.com">you@example.com</a></p></div></section>
+</main>
+${foot}`,'css/style.css','js/app.js')]);
+    f.push(['css',d+'/css/style.css',BASE_CSS]);
+    f.push(['js',d+'/js/app.js',`document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}
+  });
+});`]);
+  }else if(kind==='todo'){
+    f.push(['html',d+'/index.html',pageShell(T,`<main class="wrap" style="max-width:560px;padding-top:56px">
+<h1>${T}</h1>
+<form id="f" style="display:flex;gap:8px;max-width:none"><input id="t" placeholder="What needs to be done?" style="flex:1" autofocus><button class="btn">Add</button></form>
+<ul id="list" style="list-style:none;padding:0;margin:18px 0"></ul>
+<p id="count" style="color:var(--muted)"></p>
+</main>`,'css/style.css','js/app.js')]);
+    f.push(['css',d+'/css/style.css',BASE_CSS+`#list li{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid var(--line)}
+#list li.done span{text-decoration:line-through;color:var(--muted)}#list li span{flex:1}
+#list button{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer}
+`]);
+    f.push(['js',d+'/js/app.js',`var tasks=JSON.parse(localStorage.getItem('tasks')||'[]');
+var list=document.getElementById('list');
+function save(){localStorage.setItem('tasks',JSON.stringify(tasks))}
+function render(){
+  list.innerHTML='';
+  tasks.forEach(function(t,i){
+    var li=document.createElement('li');if(t.done)li.className='done';
+    var c=document.createElement('input');c.type='checkbox';c.checked=t.done;
+    c.onchange=function(){t.done=c.checked;save();render()};
+    var s=document.createElement('span');s.textContent=t.text;
+    var x=document.createElement('button');x.textContent='×';
+    x.onclick=function(){tasks.splice(i,1);save();render()};
+    li.append(c,s,x);list.appendChild(li);
+  });
+  var left=tasks.filter(function(t){return !t.done}).length;
+  document.getElementById('count').textContent=left+' left';
+}
+document.getElementById('f').onsubmit=function(e){
+  e.preventDefault();
+  var v=document.getElementById('t').value.trim();
+  if(!v)return;
+  tasks.push({text:v,done:false});save();render();e.target.reset();
+};
+render();`]);
+  }else if(kind==='calc'){
+    f.push(['html',d+'/index.html',pageShell(T,`<main class="wrap" style="max-width:320px;padding-top:56px">
+<h1>${T}</h1>
+<div id="screen" class="screen">0</div>
+<div id="keys" class="keys"></div>
+</main>`,'css/style.css','js/app.js')]);
+    f.push(['css',d+'/css/style.css',BASE_CSS+`.screen{background:#111;color:#fff;border-radius:12px;padding:18px;text-align:right;font-size:32px;min-height:70px;overflow:hidden}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.keys button{padding:16px;font-size:20px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.keys button.op{background:var(--accent);color:#fff;border-color:transparent}
+`]);
+    f.push(['js',d+'/js/app.js',`var screen=document.getElementById('screen'),expr='';
+var keys=['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C','(',')','^'];
+keys.forEach(function(k){
+  var b=document.createElement('button');b.textContent=k;
+  if('/*-+=^'.indexOf(k)>-1)b.className='op';
+  b.onclick=function(){press(k)};
+  document.getElementById('keys').appendChild(b);
+});
+function press(k){
+  if(k==='C'){expr='';}
+  else if(k==='='){expr=String(calc(expr));}
+  else{expr+=k;}
+  screen.textContent=expr||'0';
+}
+/* safe calculator: no eval */
+function calc(s){
+  var i=0;
+  function expr(){var v=term();while(s[i]==='+'||s[i]==='-'){var o=s[i++];var r=term();v=o==='+'?v+r:v-r}return v}
+  function term(){var v=pow();while(s[i]==='*'||s[i]==='/'){var o=s[i++];var r=pow();v=o==='*'?v*r:v/r}return v}
+  function pow(){var b=atom();if(s[i]==='^'){i++;return Math.pow(b,pow())}return b}
+  function atom(){
+    if(s[i]==='('){i++;var v=expr();i++;return v}
+    var st=i;if(s[i]==='-')i++;
+    while(i<s.length&&/[0-9.]/.test(s[i]))i++;
+    return parseFloat(s.slice(st,i));
+  }
+  try{var r=expr();return isFinite(r)?+r.toPrecision(12):'Error'}catch(e){return 'Error'}
+}`]);
+  }else if(kind==='game'){
+    f.push(['html',d+'/index.html',pageShell(T,`<main class="wrap" style="max-width:360px;padding-top:40px;text-align:center">
+<h1>${T}</h1>
+<p id="status">X's turn</p>
+<div id="board" class="board"></div>
+<button class="btn" id="reset" style="margin-top:16px">New game</button>
+</main>`,'css/style.css','js/app.js')]);
+    f.push(['css',d+'/css/style.css',BASE_CSS+`.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cell{aspect-ratio:1;font-size:44px;font-weight:700;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.cell:hover{background:#f6f5f2}
+`]);
+    f.push(['js',d+'/js/app.js',`var board=Array(9).fill(''),turn='X',over=false;
+var el=document.getElementById('board'),st=document.getElementById('status');
+var lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function draw(){
+  el.innerHTML='';
+  board.forEach(function(v,i){
+    var b=document.createElement('button');b.className='cell';b.textContent=v;
+    b.onclick=function(){play(i)};el.appendChild(b);
+  });
+}
+function winner(){
+  for(var l of lines){if(board[l[0]]&&board[l[0]]===board[l[1]]&&board[l[0]]===board[l[2]])return board[l[0]]}
+  return board.every(Boolean)?'draw':null;
+}
+function play(i){
+  if(over||board[i])return;
+  board[i]=turn;var w=winner();draw();
+  if(w){over=true;st.textContent=w==='draw'?'Draw!':w+' wins!';return}
+  turn=turn==='X'?'O':'X';st.textContent=turn+"'s turn";
+}
+document.getElementById('reset').onclick=function(){board=Array(9).fill('');turn='X';over=false;st.textContent="X's turn";draw()};
+draw();`]);
+  }else if(kind==='py'){
+    f.push(['python',d+'/main.py',`"""${T}"""
+import argparse
+
+
+def run(name: str) -> str:
+    return f"Hello, {name}!"
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="${T}")
+    parser.add_argument("--name", default="world")
+    args = parser.parse_args()
+    print(run(args.name))
+
+
+if __name__ == "__main__":
+    main()`]);
+    f.push(['text',d+'/requirements.txt','# add your dependencies here, one per line']);
+  }else if(kind==='node'){
+    f.push(['json',d+'/package.json',`{
+  "name": "${T.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'my-api'}",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" }
+}`]);
+    f.push(['js',d+'/server.js',`const http = require('http');
+const items = [{ id: 1, name: 'First item' }];
+
+const server = http.createServer((req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  if (req.url === '/api/items' && req.method === 'GET') {
+    res.end(JSON.stringify(items));
+  } else {
+    res.statusCode = 404;
+    res.end(JSON.stringify({ error: 'Not found' }));
+  }
+});
+
+server.listen(3000, () => console.log('http://localhost:3000/api/items'));`]);
+  }
+  const run={py:'Run it: `python main.py --name Alex`',node:'Run it: `npm start`, then open http://localhost:3000/api/items'}[kind]||'Open `index.html` in a browser.';
+  f.push(['markdown',d+'/README.md',`# ${T}\n\n${run}\n\nGenerated by Solution.AI. Edit the files freely.`]);
+  return f;
+}
+function skillBuild(q){
+  const t=q.toLowerCase();
+  if(!/(make|create|build|generate|write|code|сделай|создай|напиши|сгенерируй|запили)/.test(t))return null;
+  if(!/(site|website|web ?page|landing|page|portfolio|resume|todo|to-do|calculator|game|project|app|script|bot|api|server|сайт|страниц|проект|лендинг|портфолио|игр|калькулятор|список дел|приложени|скрипт|бот)/.test(t))return null;
+  const kind=buildKind(t),T=buildTitle(q,kind),d=T.toLowerCase().replace(/[^a-z0-9а-яё]+/g,'-').replace(/^-|-$/g,'')||'project';
+  const files=buildFiles(kind,T,d);
+  const label={landing:'landing page',portfolio:'portfolio site',todo:'to-do app',calc:'calculator',game:'tic-tac-toe game',py:'Python project',node:'Node.js API'}[kind];
+  const intro=RU(q)?`Готово: **${T}** (${label}). Файлы ниже, их можно скачать по одному или всем архивом.`:`Done: **${T}** (${label}). Download each file, or everything as one .zip.`;
+  const how=kind==='py'?'':(RU(q)?'\n\nОткрой `index.html` в браузере. Хочешь другие цвета, разделы или функции — напиши, что изменить.':'\n\nOpen `index.html` in a browser. Tell me what to change (colors, sections, features) and I will adjust it.');
+  return intro+'\n\n'+files.map(x=>fenced(x[0],x[1],x[2])).join('\n\n')+'\n\n'+fenced('zip',d+'.zip','')+how;
+}
+
+
+/* ---------- Composer: assembles sites from small blocks and learns from feedback ---------- */
+const FB_DB='https://payzone-93e6e-default-rtdb.europe-west1.firebasedatabase.app';
+const L0={recipes:[],facts:[],share:true};
+S.learn=Object.assign({},L0,LS.get('up_learn',{}));
+const saveLearn=()=>LS.set('up_learn',S.learn);
+const SHARED={recipes:[],facts:[],at:0,busy:null};
+const STOPW=new Set('the a an and or of to in on for with is are was what who how why do does me my make create build write app site website page please can you this that it from into about как что это для или про при мне мой сделай создай напиши нужен нужна'.split(' '));
+const toks=s=>[...new Set((String(s).toLowerCase().match(/[a-zа-яё0-9]{3,}/g)||[]).filter(w=>!STOPW.has(w)))];
+const overlap=(a,b)=>{if(!a.length||!b.length)return 0;const B=new Set(b);let n=0;a.forEach(x=>B.has(x)&&n++);return n/Math.max(a.length,b.length)};
+async function fbGet(path){
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),4500);
+  try{const r=await fetch(FB_DB+'/'+path+'.json?orderBy=%22%24key%22&limitToLast=200',{signal:ctl.signal});if(!r.ok)return[];const j=await r.json();return j?Object.values(j):[]}catch(e){return[]}finally{clearTimeout(to)}
+}
+function fbPush(path,obj){if(!S.learn.share)return;try{fetch(FB_DB+'/'+path+'.json',{method:'POST',body:JSON.stringify(obj),keepalive:true}).catch(()=>{})}catch(e){}}
+function loadShared(){
+  if(!S.learn.share)return Promise.resolve();
+  if(SHARED.busy)return SHARED.busy;
+  if(Date.now()-SHARED.at<600000)return Promise.resolve();
+  return SHARED.busy=Promise.all([fbGet('recipes'),fbGet('facts')]).then(r=>{
+    SHARED.recipes=r[0].filter(x=>x&&Array.isArray(x.t)&&Array.isArray(x.b)).slice(-200);
+    SHARED.facts=r[1].filter(x=>x&&typeof x.q==='string'&&typeof x.a==='string').slice(-200);
+    SHARED.at=Date.now();SHARED.busy=null});
+}
+const cleanTxt=(s,n)=>String(s).replace(/[\u0000-\u001f<>]/g,' ').replace(/\s+/g,' ').trim().slice(0,n);
+function teachCmd(q){
+  const m=q.match(/^\s*(?:teach|remember|learn|запомни|выучи|обучись)\s*[:\-]?\s*(.{2,120}?)\s*(?:=>|->|=|—| is | это )\s*(.{1,300})$/i);
+  if(!m)return null;
+  const f={q:cleanTxt(m[1],120),a:cleanTxt(m[2],300),t:Date.now()};
+  if(!f.q||!f.a)return null;
+  S.learn.facts=S.learn.facts.filter(x=>x.q.toLowerCase()!==f.q.toLowerCase()).concat(f).slice(-300);saveLearn();fbPush('facts',f);
+  return RU(q)?`Запомнил: **${f.q}** → ${f.a}\n\nТеперь я отвечу так на похожий вопрос${S.learn.share?' (и поделился этим с остальными)':''}.`:`Learned: **${f.q}** → ${f.a}\n\nI will answer like this next time${S.learn.share?' (and shared it with other Solution users)':''}.`;
+}
+function learnedFact(q){
+  const qt=toks(q);if(!qt.length)return null;let best=null,bs=0;
+  S.learn.facts.concat(SHARED.facts).forEach(f=>{const ft=toks(f.q),s=Math.min(overlap(qt,ft),overlap(ft,qt)+.001)*0+overlap(ft,qt)*(ft.length>1?1:.7);if(s>bs){bs=s;best=f}});
+  return bs>=.75?best:null;
+}
+function forgetAll(){S.learn.recipes=[];S.learn.facts=[];saveLearn()}
+
+/* palettes */
+const PALS={
+  mono:{a:'#2563eb',bg:'#ffffff',ink:'#1f1f1f',mu:'#6b6b6b',line:'#e7e5e0',card:'#ffffff'},
+  warm:{a:'#c2410c',bg:'#fffaf5',ink:'#2a1c12',mu:'#7a6555',line:'#efe1d3',card:'#ffffff'},
+  tech:{a:'#4f46e5',bg:'#f8f9ff',ink:'#14162b',mu:'#5b5f80',line:'#e2e4f5',card:'#ffffff'},
+  green:{a:'#15803d',bg:'#f6fbf7',ink:'#10261a',mu:'#52705e',line:'#dcebe1',card:'#ffffff'},
+  dark:{a:'#7c9cff',bg:'#0f1115',ink:'#eef0f4',mu:'#9aa1ad',line:'#232733',card:'#171a21'},
+  rose:{a:'#be185d',bg:'#fff7fa',ink:'#2b1220',mu:'#7d5a6c',line:'#f3dbe5',card:'#ffffff'}
+};
+const PAL_RE={warm:/cafe|coffee|food|restaurant|sushi|pizza|bakery|bar\b|кафе|кофе|еда|ресторан|суши|пицц|пекарн/,tech:/tech|\bai\b|saas|startup|software|code|dev|стартап|софт|нейро|технолог/,green:/nature|eco|garden|farm|health|yoga|fitness|travel|природ|эко|сад|ферм|здоров|йога|фитнес|путешеств/,dark:/game|music|night|crypto|gaming|dj|игр|музык|ночн|крипт|snake|змейк/,rose:/beauty|wedding|flower|fashion|salon|spa|красот|свадьб|цвет|мода|салон/};
+const TAGS={
+  warm:['Fresh every day','Made with care','Fast, friendly service','Good food and good people, made fresh every day.'],
+  tech:['Fast setup','Built to scale','Secure by default','Smart tools that save your team hours every week.'],
+  green:['Natural and simple','Good for you','Made to last','Simple, honest and kind to the planet.'],
+  dark:['Play together','Always online','Earn rewards','Built for people who love to play.'],
+  rose:['Made for you','Premium quality','Easy booking','Beautiful details, careful work.'],
+  mono:['Simple','Fast','Reliable','A clean, fast site that does one thing well.']
+};
+const TAGS_RU={
+  warm:['Свежее каждый день','Готовим с душой','Быстрое обслуживание','Вкусная еда и хорошая атмосфера каждый день.'],
+  tech:['Быстрый старт','Растёт вместе с вами','Безопасно','Умные инструменты, которые экономят часы работы.'],
+  green:['Просто и натурально','Полезно','Надолго','Просто, честно и бережно к природе.'],
+  dark:['Играйте вместе','Всегда онлайн','Награды','Создано для тех, кто любит играть.'],
+  rose:['Сделано для вас','Высокое качество','Лёгкая запись','Красивые детали и аккуратная работа.'],
+  mono:['Просто','Быстро','Надёжно','Чистый и быстрый сайт, который делает своё дело.']
+};
+const ORDER=['nav','hero','todo','notes','counter','stopwatch','calc','ttt','snake','features','about','gallery','pricing','testimonials','faq','cta','contact','footer'];
+const WIDGETS={todo:/to-?do|task|список дел|задач/,calc:/calculator|калькулятор/,counter:/counter|счётчик|счетчик|tally/,stopwatch:/stopwatch|timer|секундомер|таймер/,notes:/notes?\b|заметк/,snake:/snake|змейк/,ttt:/tic[- ]?tac|крестики|\bgame\b|игр/};
+const LABELS={features:['Features','Возможности'],about:['About','О нас'],gallery:['Gallery','Галерея'],pricing:['Pricing','Цены'],testimonials:['Reviews','Отзывы'],faq:['FAQ','Вопросы'],contact:['Contact','Контакты'],todo:['Tasks','Задачи'],notes:['Notes','Заметки'],counter:['Counter','Счётчик'],stopwatch:['Timer','Таймер'],calc:['Calculator','Калькулятор'],ttt:['Game','Игра'],snake:['Game','Игра']};
+
+function planBuild(q,T){
+  const t=q.toLowerCase(),why=[];
+  let pal='mono';for(const k in PAL_RE)if(PAL_RE[k].test(t)){pal=k;break}
+  let sec,w=Object.keys(WIDGETS).find(k=>WIDGETS[k].test(t));
+  if(w&&/snake|змейк/.test(t))w='snake';
+  if(w){sec=['nav','hero',w,'footer'];why.push('app: '+w)}
+  else{
+    sec=['nav','hero','features','about','cta','contact','footer'];
+    if(/price|pricing|shop|store|saas|plan|subscription|цен|магазин|тариф|подписк/.test(t))sec.push('pricing');
+    if(/portfolio|gallery|photo|shop|store|menu|портфолио|галере|фото|магазин|меню/.test(t))sec.push('gallery');
+    if(/cafe|shop|store|service|review|кафе|магазин|отзыв|услуг/.test(t))sec.push('testimonials');
+    if(/saas|faq|startup|app\b|вопрос|стартап/.test(t))sec.push('faq');
+  }
+  const qt=toks(q);let best=null,bs=0,neg=[];
+  S.learn.recipes.concat(SHARED.recipes).forEach(r=>{
+    const s=overlap(qt,r.t);if(s<.34)return;
+    if((r.r||1)>0&&s*(r.n||1)>bs){bs=s*(r.n||1);best=r}
+    if((r.r||1)<0)neg=neg.concat(r.b);
+  });
+  let learned=0;
+  if(best){const ok=best.b.filter(b=>ORDER.includes(b));ok.forEach(b=>{if(!sec.includes(b)&&(w?b===w||['features','about'].includes(b)===false:true)){sec.push(b);learned++}});if(PALS[best.p]&&pal==='mono'&&!Object.keys(PAL_RE).some(k=>PAL_RE[k].test(t)))pal=best.p;why.push('used a recipe I learned (similar request)')}
+  if(neg.length){const protect=['nav','hero','footer',w];const rm=neg.filter(b=>sec.includes(b)&&!protect.includes(b)&&!(best&&best.b.includes(b)));if(rm.length){sec=sec.filter(b=>!rm.includes(b));why.push('left out '+rm.join(', ')+' (you disliked it before)')}}
+  sec=[...new Set(sec)].sort((a,b)=>ORDER.indexOf(a)-ORDER.indexOf(b));
+  return{sec,pal,why,learned,tokens:qt.slice(0,12)};
+}
+
+function blockHtml(id,c){
+  const{T,x,tag,feats,sec}=c;
+  switch(id){
+  case 'nav':return`<header class="nav"><div class="wrap"><a class="logo" href="#top">${T}</a><nav>${sec.filter(s=>LABELS[s]&&s!=='cta').map(s=>`<a href="#${s}">${x(LABELS[s][0],LABELS[s][1])}</a>`).join('')}</nav></div></header>`;
+  case 'hero':{const to=sec.find(s=>['todo','notes','counter','stopwatch','calc','ttt','snake','pricing','contact'].includes(s))||'about';return`<section class="hero" id="top"><div class="wrap"><h1 class="rv">${T}</h1><p class="rv">${tag}</p><div class="rv"><a class="btn" href="#${to}">${x('Get started','Начать')}</a> <a class="btn ghost" href="#footer">${x('Learn more','Подробнее')}</a></div></div></section>`}
+  case 'features':return`<section id="features"><div class="wrap"><h2 class="rv">${x('Why ' + T,'Почему '+T)}</h2><div class="grid">${feats.map((f,i)=>`<div class="card rv" style="--d:${i*80}ms"><div class="ico">${i+1}</div><h3>${f}</h3><p>${x('Short description of this benefit. Edit this text in index.html.','Короткое описание преимущества. Измени текст в index.html.')}</p></div>`).join('')}</div></div></section>`;
+  case 'about':return`<section id="about"><div class="wrap narrow"><h2 class="rv">${x('About us','О нас')}</h2><p class="rv">${x('Tell your story here: who you are, what you do and why people trust you.','Расскажи о себе: кто вы, чем занимаетесь и почему вам доверяют.')}</p><p class="rv muted">${tag}</p></div></section>`;
+  case 'gallery':return`<section id="gallery"><div class="wrap"><h2 class="rv">${x('Gallery','Галерея')}</h2><div class="tiles">${[0,1,2,3,4,5].map(i=>`<div class="tile rv" style="--h:${i*47};--d:${i*60}ms"></div>`).join('')}</div><p class="muted small">${x('Replace these tiles with your own photos.','Замени плитки своими фото.')}</p></div></section>`;
+  case 'pricing':return`<section id="pricing"><div class="wrap"><h2 class="rv">${x('Pricing','Цены')}</h2><div class="grid">${[['Basic','$9'],['Pro','$19'],['Team','$39']].map((p,i)=>`<div class="card rv ${i===1?'pop':''}" style="--d:${i*80}ms"><h3>${p[0]}</h3><div class="price">${p[1]}<small>/mo</small></div><p>${x('Sample plan. Edit names and prices.','Пример тарифа. Измени названия и цены.')}</p><a class="btn ${i===1?'':'ghost'}" href="#contact">${x('Choose','Выбрать')}</a></div>`).join('')}</div></div></section>`;
+  case 'testimonials':return`<section id="testimonials"><div class="wrap"><h2 class="rv">${x('Reviews','Отзывы')}</h2><div class="grid">${['A customer','Another customer','A regular'].map((n,i)=>`<div class="card rv" style="--d:${i*80}ms"><p>"${x('Sample review. Replace it with a real one.','Пример отзыва. Замени настоящим.')}"</p><b>${n}</b></div>`).join('')}</div></div></section>`;
+  case 'faq':return`<section id="faq"><div class="wrap narrow"><h2 class="rv">FAQ</h2>${[['How does it work?','Describe the first step here.'],['How much does it cost?','Explain your pricing here.'],['How can I contact you?','Use the form below.']].map(f=>`<details class="rv"><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join('')}</div></section>`;
+  case 'cta':return`<section id="cta"><div class="wrap"><div class="banner rv"><h2>${x('Ready to start?','Готовы начать?')}</h2><a class="btn light" href="#contact">${x('Contact us','Связаться')}</a></div></div></section>`;
+  case 'contact':return`<section id="contact"><div class="wrap narrow"><h2 class="rv">${x('Contact','Контакты')}</h2><form id="cf" class="rv"><input name="name" placeholder="${x('Your name','Ваше имя')}" required><input name="email" type="email" placeholder="Email" required><textarea name="msg" rows="4" placeholder="${x('Message','Сообщение')}"></textarea><button class="btn">${x('Send','Отправить')}</button><p id="cs" class="muted small" role="status"></p></form></div></section>`;
+  case 'footer':return`<footer id="footer"><div class="wrap">&copy; <span id="yr"></span> ${T}. ${x('Made with Solution.AI','Сделано в Solution.AI')}</div></footer>`;
+  case 'todo':return`<section id="todo"><div class="wrap narrow"><h2>${x('Tasks','Задачи')}</h2><form id="tf" class="row"><input id="ti" placeholder="${x('What needs to be done?','Что нужно сделать?')}" autocomplete="off"><button class="btn">${x('Add','Добавить')}</button></form><ul id="tl" class="list"></ul><p id="tc" class="muted small"></p></div></section>`;
+  case 'notes':return`<section id="notes"><div class="wrap narrow"><h2>${x('Notes','Заметки')}</h2><form id="nf" class="row"><input id="ni" placeholder="${x('Write a note','Напиши заметку')}" autocomplete="off"><button class="btn">${x('Save','Сохранить')}</button></form><ul id="nl" class="list"></ul></div></section>`;
+  case 'counter':return`<section id="counter"><div class="wrap narrow center"><h2>${x('Counter','Счётчик')}</h2><div id="cv" class="big">0</div><div class="row c"><button class="btn ghost" id="cm">&minus;</button><button class="btn" id="cp">+</button><button class="btn ghost" id="cr">${x('Reset','Сброс')}</button></div></div></section>`;
+  case 'stopwatch':return`<section id="stopwatch"><div class="wrap narrow center"><h2>${x('Timer','Таймер')}</h2><div id="sv" class="big">00:00.0</div><div class="row c"><button class="btn" id="sg">${x('Start','Старт')}</button><button class="btn ghost" id="sr">${x('Reset','Сброс')}</button></div></div></section>`;
+  case 'calc':return`<section id="calc"><div class="wrap narrow center"><h2>${x('Calculator','Калькулятор')}</h2><div class="calc"><div id="cd" class="cd">0</div><div id="ck" class="ck">${['7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+','C','(',')','⌫'].map(k=>`<button class="btn ${/[0-9.]/.test(k)?'ghost':''}" data-k="${k}">${k}</button>`).join('')}</div></div></div></section>`;
+  case 'ttt':return`<section id="ttt"><div class="wrap narrow center"><h2>Tic-Tac-Toe</h2><div id="board" class="board"></div><p id="st" class="muted">X to move</p><button class="btn ghost" id="rs">${x('Restart','Заново')}</button></div></section>`;
+  case 'snake':return`<section id="snake"><div class="wrap narrow center"><h2>Snake</h2><canvas id="cv2" width="320" height="320" class="cv"></canvas><p id="ss" class="muted">${x('Arrow keys or WASD. Press a key to start.','Стрелки или WASD. Нажми клавишу для старта.')}</p></div></section>`;
+  }
+  return'';
+}
+const BLOCK_JS={
+  contact:`(function(){var f=document.getElementById('cf');if(!f)return;f.addEventListener('submit',function(e){e.preventDefault();document.getElementById('cs').textContent='Thanks! (demo: connect a backend or a form service to receive messages)';f.reset()})})();`,
+  todo:`(function(){var K='tasks',t=[];try{t=JSON.parse(localStorage.getItem(K))||[]}catch(e){}
+var ul=document.getElementById('tl'),c=document.getElementById('tc');
+function save(){try{localStorage.setItem(K,JSON.stringify(t))}catch(e){}}
+function draw(){ul.innerHTML='';t.forEach(function(x,i){var li=document.createElement('li');if(x.d)li.className='done';var b=document.createElement('input');b.type='checkbox';b.checked=x.d;b.onchange=function(){x.d=b.checked;save();draw()};var s=document.createElement('span');s.textContent=x.t;var r=document.createElement('button');r.className='x';r.textContent='\\u00d7';r.onclick=function(){t.splice(i,1);save();draw()};li.append(b,s,r);ul.appendChild(li)});c.textContent=t.filter(function(x){return!x.d}).length+' left'}
+document.getElementById('tf').onsubmit=function(e){e.preventDefault();var i=document.getElementById('ti'),v=i.value.trim();if(!v)return;t.push({t:v,d:false});i.value='';save();draw()};draw()})();`,
+  notes:`(function(){var K='notes',n=[];try{n=JSON.parse(localStorage.getItem(K))||[]}catch(e){}
+var ul=document.getElementById('nl');function save(){try{localStorage.setItem(K,JSON.stringify(n))}catch(e){}}
+function draw(){ul.innerHTML='';n.forEach(function(x,i){var li=document.createElement('li');var s=document.createElement('span');s.textContent=x;var r=document.createElement('button');r.className='x';r.textContent='\\u00d7';r.onclick=function(){n.splice(i,1);save();draw()};li.append(s,r);ul.appendChild(li)})}
+document.getElementById('nf').onsubmit=function(e){e.preventDefault();var i=document.getElementById('ni'),v=i.value.trim();if(!v)return;n.unshift(v);i.value='';save();draw()};draw()})();`,
+  counter:`(function(){var n=0,v=document.getElementById('cv');function s(d){n=d===0?0:n+d;v.textContent=n}
+document.getElementById('cp').onclick=function(){s(1)};document.getElementById('cm').onclick=function(){s(-1)};document.getElementById('cr').onclick=function(){s(0)}})();`,
+  stopwatch:`(function(){var t0=0,acc=0,run=false,v=document.getElementById('sv'),g=document.getElementById('sg'),id=0;
+function fmt(ms){var s=ms/1000,m=Math.floor(s/60);return String(m).padStart(2,'0')+':'+(s%60).toFixed(1).padStart(4,'0')}
+function tick(){v.textContent=fmt(acc+(run?Date.now()-t0:0))}
+g.onclick=function(){if(run){acc+=Date.now()-t0;run=false;clearInterval(id);g.textContent='Start'}else{t0=Date.now();run=true;id=setInterval(tick,100);g.textContent='Pause'}tick()};
+document.getElementById('sr').onclick=function(){run=false;acc=0;clearInterval(id);g.textContent='Start';tick()}})();`,
+  calc:`(function(){var d=document.getElementById('cd'),e='';
+function show(){d.textContent=e||'0'}
+document.getElementById('ck').onclick=function(ev){var k=ev.target.dataset&&ev.target.dataset.k;if(!k)return;
+if(k==='C')e='';else if(k==='\\u232b')e=e.slice(0,-1);else if(k==='='){if(/^[0-9+\\-*\\/(). ]+$/.test(e)){try{var r=Function('return ('+e+')')();e=String(+r.toPrecision(12))}catch(x){e='Error'}}}else{if(e==='Error')e='';e+=k}show()};show()})();`,
+  ttt:`(function(){var b=document.getElementById('board'),st=document.getElementById('st'),c=Array(9).fill(''),t='X',over=false;
+var L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function w(){for(var i=0;i<L.length;i++){var a=L[i];if(c[a[0]]&&c[a[0]]===c[a[1]]&&c[a[0]]===c[a[2]])return c[a[0]]}return c.every(Boolean)?'D':''}
+function draw(){b.innerHTML='';c.forEach(function(v,i){var s=document.createElement('button');s.className='cell';s.textContent=v;s.onclick=function(){if(c[i]||over)return;c[i]=t;var r=w();if(r){over=true;st.textContent=r==='D'?'Draw':r+' wins!'}else{t=t==='X'?'O':'X';st.textContent=t+' to move'}draw()};b.appendChild(s)})}
+document.getElementById('rs').onclick=function(){c=Array(9).fill('');t='X';over=false;st.textContent='X to move';draw()};draw()})();`,
+  snake:`(function(){var cv=document.getElementById('cv2'),x=cv.getContext('2d'),N=16,Z=cv.width/N,s,d,f,tm=0,sc=0,msg=document.getElementById('ss');
+function reset(){s=[{x:8,y:8}];d={x:1,y:0};sc=0;food();}
+function food(){f={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N)};if(s.some(function(p){return p.x===f.x&&p.y===f.y}))food()}
+function step(){var h={x:(s[0].x+d.x+N)%N,y:(s[0].y+d.y+N)%N};if(s.some(function(p){return p.x===h.x&&p.y===h.y})){clearInterval(tm);tm=0;msg.textContent='Game over. Score '+sc+'. Press a key to restart.';return}
+s.unshift(h);if(h.x===f.x&&h.y===f.y){sc++;food()}else s.pop();draw()}
+function draw(){var cs=getComputedStyle(document.documentElement);x.fillStyle=cs.getPropertyValue('--card');x.fillRect(0,0,cv.width,cv.height);x.fillStyle=cs.getPropertyValue('--a');s.forEach(function(p){x.fillRect(p.x*Z+1,p.y*Z+1,Z-2,Z-2)});x.fillStyle='#e11d48';x.fillRect(f.x*Z+2,f.y*Z+2,Z-4,Z-4)}
+var K={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};
+document.addEventListener('keydown',function(e){var k=K[e.key];if(!k)return;e.preventDefault();if(!(k[0]===-d.x&&k[1]===-d.y&&s.length>1))d={x:k[0],y:k[1]};if(!tm){reset();d={x:k[0],y:k[1]};msg.textContent='';tm=setInterval(step,120)}});
+reset();draw()})();`
+};
+const BLOCK_CSS={
+  features:'.ico{width:34px;height:34px;border-radius:10px;background:var(--a);color:#fff;display:grid;place-items:center;font-weight:700;margin-bottom:12px}',
+  gallery:'.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.tile{aspect-ratio:4/3;border-radius:14px;background:linear-gradient(135deg,hsl(var(--h),70%,62%),hsl(calc(var(--h) + 40),70%,48%));transition:transform .3s}.tile:hover{transform:scale(1.03)}',
+  pricing:'.price{font-size:34px;font-weight:700;margin:6px 0}.price small{font-size:14px;color:var(--mu);font-weight:400}.card.pop{border-color:var(--a);box-shadow:0 8px 30px rgba(0,0,0,.08)}.card .btn{margin-top:12px}',
+  faq:'details{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;background:var(--card)}summary{cursor:pointer;font-weight:600}details p{margin:10px 0 0;color:var(--mu)}',
+  cta:'.banner{background:var(--a);color:#fff;border-radius:18px;padding:40px;text-align:center}.banner h2{margin:0 0 16px}.btn.light{background:#fff;color:#111}',
+  contact:'form{display:grid;gap:10px}input,textarea{font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}input:focus,textarea:focus{outline:2px solid var(--a);outline-offset:1px}',
+  todo:'.row{display:flex;gap:8px}.row.c{justify-content:center;margin-top:12px}.row input{flex:1}.list{list-style:none;padding:0;margin:16px 0}.list li{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--card);animation:rise .3s}.list li span{flex:1}.list li.done span{text-decoration:line-through;color:var(--mu)}.x{border:0;background:none;font-size:20px;color:var(--mu);cursor:pointer}',
+  counter:'.big{font-size:84px;font-weight:700;letter-spacing:-.03em;margin:10px 0}',
+  calc:'.calc{max-width:320px;margin:auto}.cd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:right;font-size:30px;margin-bottom:10px;overflow:auto}.ck{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.ck .btn{padding:14px 0}',
+  ttt:'.board{display:grid;grid-template-columns:repeat(3,90px);gap:8px;justify-content:center;margin:16px 0}.cell{height:90px;font-size:38px;font-weight:700;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer}.cell:hover{border-color:var(--a)}',
+  snake:'.cv{border:1px solid var(--line);border-radius:14px;max-width:100%}'
+};
+BLOCK_CSS.notes=BLOCK_CSS.todo;BLOCK_CSS.stopwatch=BLOCK_CSS.counter;
+const BASE_CSS2=pal=>`:root{--a:${pal.a};--bg:${pal.bg};--ink:${pal.ink};--mu:${pal.mu};--line:${pal.line};--card:${pal.card}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
+a{color:var(--a);text-decoration:none}.wrap{max-width:980px;margin:0 auto;padding:0 20px}.narrow{max-width:640px}.center{text-align:center}.muted{color:var(--mu)}.small{font-size:13px}
+header.nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}header.nav nav{display:flex;gap:18px;overflow:auto}header.nav nav a{color:var(--mu);white-space:nowrap}header.nav nav a:hover{color:var(--ink)}
+.logo{font-weight:700;font-size:18px;color:var(--ink)}
+.btn{display:inline-block;padding:11px 20px;border-radius:10px;background:var(--a);color:#fff;border:0;font:inherit;font-weight:600;cursor:pointer;transition:transform .15s,filter .15s}.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.hero{padding:96px 0 72px;text-align:center;background:radial-gradient(ellipse at 50% -10%,color-mix(in srgb,var(--a) 16%,transparent),transparent 60%)}
+.hero h1{font-size:clamp(36px,7vw,64px);line-height:1.05;margin:0 0 16px;letter-spacing:-.03em}.hero p{color:var(--mu);font-size:19px;max-width:560px;margin:0 auto 28px}
+section{padding:48px 0}h2{font-size:30px;margin:0 0 18px;letter-spacing:-.02em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.card{border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--card);transition:transform .25s,box-shadow .25s}.card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.07)}.card h3{margin:0 0 6px}.card p{margin:0;color:var(--mu)}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--mu);text-align:center;font-size:14px}
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s ease var(--d,0ms),transform .6s ease var(--d,0ms)}.rv.in{opacity:1;transform:none}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}*{animation:none!important}}
+@media(max-width:600px){.hero{padding:64px 0 48px}header.nav nav{gap:12px;font-size:14px}}
+`;
+const BASE_JS2=`(function(){var io='IntersectionObserver' in window?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12}):null;
+document.querySelectorAll('.rv').forEach(function(el){io?io.observe(el):el.classList.add('in')});
+var y=document.getElementById('yr');if(y)y.textContent=new Date().getFullYear()})();
+`;
+let LAST_RECIPE=null;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function composeBuild(q,prog){
+  const t=q.toLowerCase();
+  if(!/(make|create|build|generate|write|code|сделай|создай|напиши|сгенерируй|запили)/.test(t))return null;
+  if(!/(site|website|web ?page|landing|page|portfolio|resume|todo|to-do|calculator|game|project|app|сайт|страниц|проект|лендинг|портфолио|игр|калькулятор|список дел|приложени|заметк|таймер|счётчик|счетчик|секундомер|змейк|snake)/.test(t))return null;
+  const kind=buildKind(t);
+  if(kind==='py'||kind==='node')return skillBuild(q);
+  const ru=RU(q),x=(a,b)=>ru?b:a,log=[];
+  let T=buildTitle(q,kind);const wk=Object.keys(WIDGETS).find(k=>WIDGETS[k].test(t));
+  if(/snake|змейк/.test(t)&&/^(Tic-Tac-Toe|My Project)$/.test(T))T='Snake';
+  else if(wk&&/^My Project$/.test(T))T={notes:'Notes',counter:'Counter',stopwatch:'Timer'}[wk]||T;
+  const show=(title)=>prog&&prog('**'+title+'**\n\n'+log.join('\n'));
+  log.push('→ '+x('Reading the request','Читаю запрос'));show(x('Thinking…','Думаю…'));await sleep(450);
+  log[0]='✓ '+x('Request: ','Запрос: ')+'`'+T+'`';
+  log.push('→ '+x('Looking up what I learned before','Вспоминаю, чему научился'));show(x('Thinking…','Думаю…'));
+  await Promise.race([loadShared(),sleep(2500)]);
+  const P=planBuild(q,T);
+  log[1]='✓ '+x('Learned recipes checked: ','Проверил, чему учился: ')+(S.learn.recipes.length+SHARED.recipes.length)+(P.why.length?' ('+P.why.join('; ')+')':'');
+  log.push('→ '+x('Choosing blocks','Выбираю блоки'));show(x('Planning…','Планирую…'));await sleep(500);
+  log[2]='✓ '+x('Blocks: ','Блоки: ')+P.sec.join(', ')+' · '+x('style ','стиль ')+P.pal;
+  const tg=(ru?TAGS_RU:TAGS)[P.pal],c={T,x,tag:tg[3],feats:tg.slice(0,3),sec:P.sec};
+  const files={};
+  log.push('→ '+x('Assembling index.html','Собираю index.html'));show(x('Building…','Собираю…'));await sleep(450);
+  files.html=pageShell(T,P.sec.map(id=>blockHtml(id,c)).join('\n'),'style.css','app.js').replace('<html lang="en">','<html lang="'+(ru?'ru':'en')+'">');
+  log[3]='✓ index.html ('+P.sec.length+' '+x('blocks','блоков')+')';
+  log.push('→ '+x('Writing style.css and app.js','Пишу style.css и app.js'));show(x('Building…','Собираю…'));await sleep(450);
+  files.css=BASE_CSS2(PALS[P.pal])+[...new Set(P.sec.map(id=>BLOCK_CSS[id]).filter(Boolean))].join('\n')+'\n';
+  files.js=BASE_JS2+P.sec.map(id=>BLOCK_JS[id]).filter(Boolean).join('\n')+'\n';
+  log[4]='✓ style.css, app.js';
+  log.push('→ '+x('Checking the result','Проверяю результат'));show(x('Checking…','Проверяю…'));await sleep(400);
+  const okJs=(()=>{try{new Function(files.js);return true}catch(e){return false}})();
+  log[5]=(okJs?'✓ ':'! ')+x('JavaScript syntax check','Проверка синтаксиса JavaScript')+(okJs?'':x(' failed','  не прошла'));
+  show(x('Done','Готово'));await sleep(250);
+  const d=T.toLowerCase().replace(/[^a-z0-9а-яё]+/g,'-').replace(/^-|-$/g,'')||'project';
+  const readme=`# ${T}\n\n${x('Open `index.html` in a browser.','Открой `index.html` в браузере.')}\n\n${x('Blocks used','Использованные блоки')}: ${P.sec.join(', ')}.\n\n${x('Generated by Solution.AI from reusable blocks.','Собрано Solution.AI из готовых блоков.')}\n`;
+  LAST_RECIPE={q,t:P.tokens,b:P.sec,p:P.pal};
+  const intro=x(`Built **${T}** from ${P.sec.length} blocks. Preview it, download the files, or tell me what to change. Rate the result so I learn what you like.`,`Собрал **${T}** из ${P.sec.length} блоков. Посмотри предпросмотр, скачай файлы или напиши, что изменить. Оцени результат, чтобы я учился на твоих вкусах.`);
+  return intro+'\n\n'+[fenced('html',d+'/index.html',files.html),fenced('css',d+'/style.css',files.css),fenced('js',d+'/app.js',files.js),fenced('markdown',d+'/README.md',readme),fenced('zip',d+'.zip','')].join('\n\n');
+}
+function learnRecipe(r,rating){
+  if(!r)return;
+  const rec={t:r.t,b:r.b,p:r.p,r:rating,n:1};
+  const i=S.learn.recipes.findIndex(x=>x.r===rating&&overlap(x.t,rec.t)>.7&&x.b.join()===rec.b.join());
+  if(i>=0)S.learn.recipes[i].n=(S.learn.recipes[i].n||1)+1;else S.learn.recipes.push(rec);
+  S.learn.recipes=S.learn.recipes.slice(-150);saveLearn();
+  fbPush('recipes',{t:rec.t,b:rec.b,p:rec.p,r:rating,at:Date.now()});
+}
+
+/* ---------- engine presets ---------- */
+const PRESETS=[
+  {key:'glm',name:'GLM 5.3',by:'Z.ai',type:'openai',modelId:'glm-5.3',base:'https://api.z.ai/api/paas/v4',icon:'zee',color:['#4f46e5','#312e81'],note:'verify the model ID in the Z.ai docs'},
+  {key:'mimo',name:'MiMo V2.6 Pro',by:'Xiaomi',type:'openai',modelId:'mimo-v2.6-pro',base:'https://api.xiaomimimo.com/v1',icon:'emm',color:['#ff7a1a','#e8590c'],note:'1M context'},
+  {key:'gemflash',logo:'gemini',name:'Gemini 3.8 Flash',by:'Google',type:'gemini',modelId:'gemini-3.8-flash',base:'',icon:'twins',color:['#5b8cff','#a45cff'],note:'1M context, key from Google AI Studio'},
+  {key:'glmor',logo:'glm',name:'GLM 5.3 via OpenRouter',by:'OpenRouter',type:'openai',modelId:'z-ai/glm-5.3',base:'https://openrouter.ai/api/v1',icon:'zee',color:['#4f46e5','#312e81'],note:'good fallback if direct calls are blocked'},
+];
+function presetHtml(sol){
+  return `<div class="sect">Quick add a model</div>`+PRESETS.map((p,i)=>`<div class="card">${avRaw(p.color,p.icon,'lg',p.logo||p.key)}<div class="grow"><div class="t">${esc(p.name)}</div><div class="d">${esc(p.by)} · ${esc(p.modelId)} · ${esc(p.note)}</div></div><button class="btn sm" data-preset="${i}" data-sol="${sol?1:''}">Add</button></div>`).join('');
+}
+function bindPresets(b){
+  b.querySelectorAll('[data-preset]').forEach(x=>x.onclick=()=>{
+    const p=PRESETS[+x.dataset.preset];
+    DRAFT={type:p.type,name:p.name,modelId:p.modelId,base:p.base,icon:p.icon,color:p.color,preset:p.logo||p.key,auto:true,_sol:!!x.dataset.sol};
+    curTab='api';editId='new';renderSettings();
+  });
+}
+
+/* ---------- Settings → Solution ---------- */
+function tabSolution(b){
+  const eng=solEngine();
+  b.innerHTML=`<h3>Solution</h3><div class="sub">Solution is the built-in agent of Solution.AI. It has no model of its own: offline it answers from the Brain file (facts, a calculator, date and time). With an <b>engine</b> it runs the Brain on top of any API model you added, so the answer quality equals the engine's quality. For GLM 5.3 / MiMo V2.6 Pro / Gemini 3.8 Flash level answers, connect one of them below.</div>
+  <div class="card">${avatar(SOLUTION,'lg')}<div class="grow"><div class="t">Solution</div><div class="d">${eng?'Brain + '+esc(eng.name):'Brain + Wikipedia'}</div></div><button class="btn sm primary" id="solUse">Use in chat</button></div>
+  <div class="field" style="margin-top:16px"><label>Engine</label><select id="solEng"><option value="">Brain only (no engine)</option>${S.api.map(m=>`<option value="${m.id}" ${m.id===S.solution.engine?'selected':''}>${esc(m.name)} · ${esc(m.modelId)}</option>`).join('')}</select></div>
+  <div class="field"><label>Answer style</label><select id="solStyle">${[['balanced','Balanced'],['concise','Concise'],['deep','Deep thinking']].map(o=>`<option value="${o[0]}" ${S.solution.style===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>
+  <div class="sect">Learning</div>
+  <div class="card"><div class="grow"><div class="t">Share what Solution learns</div><div class="d">Your 👍/👎 ratings and "teach:" facts are shared (no chats, no keys) so everyone's Solution improves</div></div><button class="sw ${S.learn.share?'on':''}" id="lrnSw"></button></div>
+  <div class="card"><div class="grow"><div class="t">Learned so far</div><div class="d">${S.learn.recipes.length} build recipes, ${S.learn.facts.length} facts. Teach it: <code>teach: question = answer</code></div></div><button class="btn sm" id="lrnClr">Forget all</button></div>
+  ${presetHtml(true)}
+  <div class="note" style="margin-top:14px">Direct calls from the browser can be blocked by a provider (CORS). If <b>Test connection</b> fails with a network error, add the model through OpenRouter instead.</div>`;
+  $('solEng').onchange=e=>{S.solution.engine=e.target.value;LS.set('up_solution',S.solution);toast(S.solution.engine?'Engine set':'Solution uses the Brain');tabSolution(b)};
+  $('solStyle').onchange=e=>{S.solution.style=e.target.value;LS.set('up_solution',S.solution);toast('Style saved')};
+  $('solUse').onclick=()=>{S.sel={provider:'solution',model:'Solution'};LS.set('up_sel',S.sel);renderBtn();toast('Solution selected')};
+  $('lrnSw').onclick=()=>{S.learn.share=!S.learn.share;saveLearn();toast(S.learn.share?'Sharing on':'Sharing off');tabSolution(b)};
+  $('lrnClr').onclick=()=>{forgetAll();toast('Forgot everything learned here');tabSolution(b)};
+  bindPresets(b);
+}
+
+/* ---------- Settings → Icons (custom logos) ---------- */
+const ICON_LIST=[SOLUTION,...PROVIDERS];
+function tabIcons(b){
+  b.innerHTML=`<h3>Icons</h3><div class="sub">Provider icons are loaded from the internet (the site icon of each company) and fall back to a built-in glyph when offline. You can also upload your own image for any provider. It is resized and stored only in this browser.</div><div class="card"><div class="grow"><div class="t">Load icons from the internet</div><div class="d">Uses the Google favicon service; no data about you is sent</div></div><button class="sw ${S.webIcons?'on':''}" id="webSw"></button></div>`+
+    ICON_LIST.map(p=>`<div class="card">${avatar(p,'lg')}<div class="grow"><div class="t">${esc(p.name)}</div><div class="d">${S.logos[p.id]?'Custom logo':(S.webIcons&&WEB_DOM[p.id]?'Web icon':'Built-in icon')}</div></div><button class="btn sm" data-up="${p.id}">Upload</button>${S.logos[p.id]?`<button class="btn sm danger" data-rs="${p.id}">Reset</button>`:''}</div>`).join('');
+  $('webSw').onclick=()=>{S.webIcons=!S.webIcons;LS.set('up_webIcons',S.webIcons);renderBtn();renderSettings()};
+  b.querySelectorAll('[data-up]').forEach(x=>x.onclick=()=>{logoTarget=x.dataset.up;$('logoIn').click()});
+  b.querySelectorAll('[data-rs]').forEach(x=>x.onclick=()=>{delete S.logos[x.dataset.rs];LS.set('up_logos',S.logos);renderBtn();renderSettings()});
+}
+$('logoIn').onchange=e=>{
+  const f=e.target.files[0];e.target.value='';if(!f||!logoTarget)return;
+  const url=URL.createObjectURL(f),img=new Image(),pid=logoTarget;
+  img.onload=()=>{
+    const w=img.naturalWidth||96,h=img.naturalHeight||96,s=Math.min(w,h),c=document.createElement('canvas');
+    c.width=c.height=96;c.getContext('2d').drawImage(img,(w-s)/2,(h-s)/2,s,s,0,0,96,96);
+    S.logos[pid]=c.toDataURL('image/png');LS.set('up_logos',S.logos);URL.revokeObjectURL(url);
+    renderBtn();toast('Icon updated');if($('overlay').classList.contains('open'))renderSettings();
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);toast('Could not read that image')};
+  img.src=url;
+};
+
 
 /* ================= INIT ================= */
 applyTheme();renderUser();renderBtn();renderPlans();renderHist();renderRepoChip();renderHero();updateSend();
